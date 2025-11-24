@@ -4,16 +4,29 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 fit = True
 
+yellow_cord_weight_kg = 33 * 0.45359237  # pounds to kg
 blue_cord_weight_kg = 45 * 0.45359237  # pounds to kg
+red_cord_weight_kg = 50 * 0.45359237  # pounds to kg
+purple_cord_weight_kg = 60 * 0.45359237  # pounds to kg
+black_cord_weight_kg = 70 * 0.45359237  # pounds to kg
 
-csv_path = "BlueCord.csv"
-cord_weight_kg = blue_cord_weight_kg
+csv_path = "BlackCord.csv"
+cord_weight_kg = black_cord_weight_kg
+cord_color = "black"
+
 gravity = 9.80636  # m/s^2 (https://www.sensorsone.com/local-gravity-calculator/) -> gravity in Ottawa
 platform_height_m = 194 * 0.3048 + 3 * 0.0254 # ft * m/ft + 3 in * m/in
 unstretched_cord_length = 48  # ft
+
+avg_ape_index = 1.0  # average ape index (arm span / height)
+avg_shoulder_span = 0.25  # proportion of height (I used myself as reference)
+avg_ancle_height = 0.08 # proportion of height (I used myself as reference)
+avg_head_height = 1/7.5  # proportion of height
+ancle_strap_to_hands_multiplier = 1 - avg_ancle_height - avg_head_height +  (avg_ape_index - avg_shoulder_span) / 2
+
+body_strap_to_feet_multiplier = 0.4 # proportion of height. rough guess
 
 def main():
     # Load data
@@ -21,7 +34,7 @@ def main():
         print(f"File not found: {csv_path}", file=sys.stderr)
         sys.exit(1)
     df = pd.read_csv(csv_path)
-    keep_cols = ["Weight", "Anchor Offset", "Water Height", "Harness", "Horizontal Distance"]
+    keep_cols = ["Brk", "Weight", "Anchor Offset", "Water Height", "Harness", "Horizontal Distance"]
     df = df[keep_cols].copy()
 
     weights = pd.to_numeric(df["Weight"], errors="coerce")
@@ -56,10 +69,10 @@ def main():
     heights = np.sqrt(703 * weights / avg_BMI)  # Takes weight in pounds and returns height in inches
 
     # The distance from the person's harness attachment point to the part of their body that touches the water
-    # Ancle harness is height of the person - ancle height
+    # Ancle harness is height of the person + arms reaching - ancle height
     # Body harness is between the chest and waist, and the person is in a seated position
-    person_harness_to_bottom = np.where(harnesses.isin(["AF", "AB"]), 0.92 * heights,
-                               np.where(harnesses.isin(["BF", "BB"]), 0.4 * heights, 0.5 * heights))
+    person_harness_to_bottom = np.where(harnesses.isin(["AF", "AB"]), ancle_strap_to_hands_multiplier * heights + 8 * 0.0254, # 8 inches for the thing that connects to the harness
+                               np.where(harnesses.isin(["BF", "BB"]), body_strap_to_feet_multiplier * heights, 0.5 * heights))
     
     # Convert to metric
     water_height_m = water_heights * 0.3048  # positive means above water, negative means below water
@@ -76,14 +89,13 @@ def main():
     x = delta_x
     y = F
     plt.figure(figsize=(8,6))
-    plt.scatter(x, y, color="tab:blue", alpha=0.8, edgecolor="k", linewidth=0.3)
+    plt.scatter(x, y, color=cord_color, alpha=0.8, edgecolor="k", linewidth=0.3)
     plt.xlabel("Stretch Length delta_x (m)")
     plt.ylabel("Force (N)")
-    plt.title(f"Force vs Stretched Length for Blue Cord (n={len(x)})")
+    plt.title(f"Force vs Stretched Length for {cord_color} Cord (n={len(x)})")
     plt.grid(True, linestyle="--", alpha=0.5)
 
     if fit:
-        # prepare numeric arrays
         x_arr = np.asarray(x).astype(float)
         y_arr = np.asarray(y).astype(float)
 
@@ -91,7 +103,7 @@ def main():
         coeffs = np.polyfit(x_arr, y_arr, 1)
         line_x = np.linspace(x_arr.min(), x_arr.max(), 100)
         line_y = np.polyval(coeffs, line_x)
-        plt.plot(line_x, line_y, color="red", linewidth=1.5, label=f"fit: y={coeffs[0]:.4g}x+{coeffs[1]:.4g}")
+        plt.plot(line_x, line_y, color="black", linewidth=1.5, label=f"fit: y={coeffs[0]:.4g}x+{coeffs[1]:.4g}")
 
         # residuals and simple outlier detection (threshold = 2 * std)
         y_pred = np.polyval(coeffs, x_arr)
@@ -123,7 +135,7 @@ def main():
                 ri = yi - (coeffs[0] * xi + coeffs[1])
                 predicted_F = coeffs[0] * xi + coeffs[1]
                 print(f"{idx+2}, {weight}, {anchor_offset}, {water_level}, {xi:.4g}, {yi:.4g}, {predicted_F:.4g}, {ri:.4g}")
-        else: print()("No outliers detected.")
+        else: print("No outliers detected.")
 
         plt.legend()
 
