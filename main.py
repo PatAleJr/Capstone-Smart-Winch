@@ -14,8 +14,8 @@ person_cross_sectional_area = 0.7  # m^2
 
 # General parameters
 air_density = 1.225  # kg/m^3 -> function of altitude and temperature
-gravity = 9.80665  # m/s^2
-platform_height = 200.0 * 0.3048 # ft * m/ft
+gravity = 9.80636  # m/s^2 (https://www.sensorsone.com/local-gravity-calculator/) -> gravity in Ottawa
+platform_height = 194 * 0.3048 + 3 * 0.0254 # ft * m/ft + 3 in * m/in
 
 def simulate(m=80.0, Cd=1.0, A=0.7, rho=1.225, g=-9.80665,
              y0=100.0, v0=0.0,
