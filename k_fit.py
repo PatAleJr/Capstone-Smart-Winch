@@ -32,10 +32,11 @@ def main():
     df = df[keep_cols].copy()
 
     acceptable_harnesses = ("AF", "AB", "BF", "BB")
+    water_numeric = pd.to_numeric(df["Water Height"], errors="coerce")
     first_filter_mask = (
         (df["Weight"].notna() & (df["Weight"] < 450)) &
         (df["Anchor Offset"].notna() & (df["Anchor Offset"] < 37)) &
-        (df["Water Height"].notna()) &
+        (water_numeric.notna()) &  # only accept numerical water heights (there are some W0 and D0)
         (df["Harness"].notna() & df["Harness"].astype(str).str.strip().isin(acceptable_harnesses)) &
         (df["Horizontal Distance"].notna() & (df["Horizontal Distance"] == 0))
     )
@@ -47,7 +48,7 @@ def main():
 
     weights = pd.to_numeric(df_filtered["Weight"], errors="coerce")
     anchor_offsets = pd.to_numeric(df_filtered["Anchor Offset"], errors="coerce") / 12  # convert to feet
-    water_heights = pd.to_numeric(df_filtered["Water Height"], errors="coerce")
+    water_heights = pd.to_numeric(df_filtered["Water Height"], errors="raise")
     harnesses = df_filtered["Harness"].astype(str)
     heights = body.estimate_height_from_weight(weights) # in feet
     person_harness_to_bottom = body.harness_to_lowest_point(harnesses, heights)
@@ -69,6 +70,8 @@ def main():
     if fit:
         x_arr = np.asarray(x).astype(float)
         y_arr = np.asarray(y).astype(float)
+
+        print(f"x_arr is {x_arr}")
 
         # linear fit
         coeffs = np.polyfit(x_arr, y_arr, 1)
