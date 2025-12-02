@@ -1,32 +1,45 @@
 import math
 import matplotlib.pyplot as plt
+import body
 
-# General parameters
+# General physical parameters
 air_density = 0.00237  # slugs/ft^3 -> function of altitude and temperature
 g = 32.1731  # ft/s^2 (https://www.sensorsone.com/local-gravity-calculator/) -> gravity in Ottawa
 platform_height = 194 + 3 * 1/12 # ft
+person_drag_coefficient = 1.0  # dimensionless
+person_cross_sectional_area = 7  # ft^2
+
+unstretched_rope_length = 48  # ft
+yellow_cord_weight = 33
+blue_cord_weight = 45
+red_cord_weight = 50
+purple_cord_weight = 60
+black_cord_weight = 70
+
+blue_K = 1.3527 # computed from end point
+blue_offset = -17.24 # lb. the constant term in equation for F = kx + b
+
+blue_K = 3.417 # Computed from energy. mean. I overwrite this later using weight
+blue_offset = 0
+
+# Simulation parameters
 t_max = 30
 
-# Cord parameters
-blue_K = 1.136
-blue_offset = 11.49 # lb. the constant term in equation for F = kx + b
-anchor_offset = 15.0  # ft
-unstretched_rope_length = 48  # ft
-blue_cord_weight = 45  # Lb
+# Jump parameters
+person_weight = 148.0  # Lbs
+anchor_offset = 25.0  # ft
+
+# Derived parameters
+person_mass = person_weight/g # Slugs
+person_height = body.estimate_height_from_weight(person_weight)
 blue_cord_mass = 45 / g # slugs
 
-# Person parameters
-person_weight = 140.0  # Lbs
-person_mass = person_weight/g # Slugs
-person_height = 1.70  # m
-person_drag_coefficient = 1.0  # dimensionless
-person_cross_sectional_area = 7.5  # ft^2
+blue_K = 0.01991 * person_weight + 0.5778
 
 t_list = []
 y_list = []
 
 def simulate():
-    k = air_density * person_drag_coefficient * person_cross_sectional_area  # drag coefficient in F = k * v^2
     t = 0.0
     dt = 0.05
     y = platform_height
@@ -35,7 +48,7 @@ def simulate():
     print_dt = 0.5
 
     print(f"   t(s)         y(ft)         v(ft/s)         a(ft/s^2)         fcord(lb)         dx(ft)         fdrag")
-    while t <= t_max and y > -20:
+    while t <= t_max and y > -50:
         delta_x = (platform_height - anchor_offset - y) - unstretched_rope_length
         if (delta_x <= 0): 
             delta_x = 0

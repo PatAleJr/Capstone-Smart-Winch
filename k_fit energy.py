@@ -57,14 +57,29 @@ def main():
     delta_x = platform_height - anchor_offsets - unstretched_cord_length - person_harness_to_bottom - water_heights
     total_weight = weights + cord_weight/2
     F = total_weight
+  
+    proportion_of_cord_at_platform_height = (unstretched_cord_length - anchor_offsets) / unstretched_cord_length
+    proportion_of_cord_dangling = anchor_offsets / unstretched_cord_length
+    cord_initial_average_height = proportion_of_cord_at_platform_height * platform_height + proportion_of_cord_dangling * (platform_height - anchor_offsets/2)
+    cord_final_average_height = platform_height - anchor_offsets - (unstretched_cord_length + delta_x) / 2
+    cord_delta_Ep = cord_weight * (cord_final_average_height - cord_initial_average_height)
+    person_delta_Ep = weights * (water_heights - platform_height)
+    delta_Ep = cord_delta_Ep + person_delta_Ep
 
-    x = delta_x
-    y = F
+    # dEp = -1/2 k dx^2
+    # Because dEp is negative, the -s cancel
+    k = -2 * delta_Ep / (delta_x * delta_x)
+
+    x = weights
+    y = k
+
+    print(k.mean())
+
     plt.figure(figsize=(8,6))
     plt.scatter(x, y, color=cord_color, alpha=0.8, edgecolor="k", linewidth=0.3)
-    plt.xlabel("Stretch Length delta_x (ft)")
-    plt.ylabel("Force (Lb)")
-    plt.title(f"Force vs Stretched Length for {cord_color} Cord (n={len(x)})")
+    plt.xlabel("weight (lb)")
+    plt.ylabel("K (lb / ft)")
+    plt.title(f"Estimate for K by weight for {cord_color} Cord (n={len(x)})")
     plt.grid(True, linestyle="--", alpha=0.5)
 
     if fit:
