@@ -56,7 +56,7 @@ def main():
     # Calculate the stretch length and the force
     delta_x = platform_height - anchor_offsets - unstretched_cord_length - person_harness_to_bottom - water_heights
     total_weight = weights + cord_weight/2
-    F = total_weight * gravity
+    F = total_weight
 
     x = delta_x
     y = F
