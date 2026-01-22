@@ -7,6 +7,9 @@ import body
 
 fit = True
 
+### THIS IS WRONG
+## Doesnt account for the damping
+
 # In pounds
 yellow_cord_weight = 33
 blue_cord_weight = 45
