@@ -64,5 +64,3 @@ def get_undamped_force(stretched_length, unstretched_length, num_loops):
     force = np.polyval(coeffs, percent_elongation)
     force_per_loop = force / 2 # 2 loops in the test setup
     return force_per_loop * num_loops
-
-fit_data(True)

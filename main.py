@@ -10,7 +10,10 @@ platform_height = 194 + 3 * 1/12 # ft
 person_drag_coefficient = 1.0  # dimensionless
 person_cross_sectional_area = 7  # ft^2
 
-unstretched_rope_length = 48  # ft
+#unstretched_rope_length = 48  # ft
+unstretched_rope_length = 56 + 5/12  # ft -> end length from spreadsheet for cord 6552
+
+
 yellow_cord_weight = 33
 blue_cord_weight = 45
 blue_num_loops = 11
@@ -21,13 +24,13 @@ black_cord_weight = 70
 damping_constant = 0.1 * 0.737  # damping constant N/m/s to lb/(ft/s)
 
 # Simulation parameters
-t_max = 30
+t_max = 10
 consider_damping = True
 consider_air_resistance = True
 
 # Jump parameters
-person_weight = 124.0  # Lbs
-anchor_offset = 34.0  # ft
+person_weight = 137.0  # Lbs
+anchor_offset = 30.0  # ft
 
 # Derived parameters
 person_mass = person_weight/g # Slugs
@@ -48,22 +51,29 @@ def simulate():
     y = platform_height
     v = 0
     next_print = 0.0
-    print_dt = 0.5
+    print_dt = 1
+
+    lowest_height = platform_height
 
     print(f"   t(s)         y(ft)         v(ft/s)         a(ft/s^2)         fcord(lb)         dx(ft)         fdrag")
     while t <= t_max and y > -50:
         delta_x = (platform_height - anchor_offset - y) - unstretched_rope_length
-        F_cord = rope_data.get_undamped_force(unstretched_rope_length + delta_x, unstretched_rope_length, blue_num_loops)
+        
+        #F_cord = rope_data.get_undamped_force(unstretched_rope_length + delta_x, unstretched_rope_length, blue_num_loops)
+        # This math is for cord 6552
+        percent_elongation = 100 * delta_x / unstretched_rope_length
+        F_elastic = 1.433 * percent_elongation + 120
+
         F_damping = damping_constant * v
         if not consider_damping: F_damping = 0.0
 
         F_drag = 0.5 * air_density * person_drag_coefficient * person_cross_sectional_area * abs(v)*-v
         if not consider_air_resistance: F_drag = 0.0
         
-        a = (F_cord + F_drag + F_damping - person_weight - blue_cord_weight/2) / (person_mass + blue_cord_mass)
+        a = (F_elastic + F_drag + F_damping - person_weight - blue_cord_weight/2) / (person_mass + blue_cord_mass)
 
         if t >= next_print - 1e-12:
-            print(f"{t:6.2f}\t{y:9.2f}\t{v:9.2f}\t{a:9.2f}\t{F_cord:9.2f}\t{delta_x:9.2f}\t{F_drag:9.2f}")
+            print(f"{t:6.2f}\t{y:9.2f}\t{v:9.2f}\t{a:9.2f}\t{F_elastic:9.2f}\t{delta_x:9.2f}\t{F_drag:9.2f}")
             next_print += print_dt
 
         #TODO: RK4 integration
@@ -73,6 +83,9 @@ def simulate():
 
         t_list.append(t)
         y_list.append(y)
+        if y < lowest_height:
+            lowest_height = y
+    print(f"Lowest height reached: {lowest_height:.2f} ft")
 
 simulate()
 
