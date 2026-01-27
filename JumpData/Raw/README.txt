@@ -1,0 +1,1 @@
+This folder includes the raw jump data for each color cord as the team copied it from the sheets

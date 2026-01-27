@@ -1,7 +1,7 @@
 import math
 import matplotlib.pyplot as plt
 import body
-import k_fit_rope_data as rope_data
+import Archive.k_fit_rope_data as rope_data
 
 # General physical parameters
 air_density = 0.00237  # slugs/ft^3 -> function of altitude and temperature
