@@ -1,99 +1,47 @@
-import math
+from dataclasses import dataclass
 import matplotlib.pyplot as plt
-import body
-import Archive.k_fit_rope_data as rope_data
+from scipy.integrate import solve_ivp
+from scipy.optimize import least_squares
+import numpy as np
+import CordRecords
 
-# General physical parameters
-air_density = 0.00237  # slugs/ft^3 -> function of altitude and temperature
+# General parameters
 g = 32.1731  # ft/s^2 (https://www.sensorsone.com/local-gravity-calculator/) -> gravity in Ottawa
 platform_height = 194 + 3 * 1/12 # ft
-person_drag_coefficient = 1.0  # dimensionless
-person_cross_sectional_area = 7  # ft^2
 
-#unstretched_rope_length = 48  # ft
-unstretched_rope_length = 56 + 5/12  # ft -> end length from spreadsheet for cord 6552
+# Jump is modelled like mx'' = mg - Fbungee(x, x') - Fair(x')
+# We need to fit parameters for Fbungee and Fair
+# Fbungee = kx + cv + o = (linear spring) + (damping) + (constant force)
+# Fair = d*|v|*v = some constant times velocity squared
 
+def simulate_jump(fitting_params, jump_data, cord):
+    k, c, d, o = fitting_params
+    starting_stretch_height = platform_height - jump_data.anchor_offset - cord.unstretched_length
+    def ode(t, y):
+        x, v = y
+        F_bungee = k*x + c*v + o if x < starting_stretch_height else 0
+        F_air = d*abs(v)*v
+        a = (F_bungee + F_air)/jump_data.mass - g
+        return [v, a]
 
-yellow_cord_weight = 33
-blue_cord_weight = 45
-blue_num_loops = 11
-red_cord_weight = 50
-purple_cord_weight = 60
-black_cord_weight = 70
+    y0 = [platform_height, 0.0]
+    sol = solve_ivp(ode, [0, 20], y0, max_step=0.1)
 
-damping_constant = 0.1 * 0.737  # damping constant N/m/s to lb/(ft/s)
+    x = sol.y[0]
+    print("Min for attempt with params " + str(fitting_params) + " is " + str(np.min(x)))
+    return np.min(x)
 
-# Simulation parameters
-t_max = 10
-consider_damping = True
-consider_air_resistance = True
+def residuals(fitting_params, jump_data, cord):
+    res = []
+    for data_point in jump_data:
+        pred = simulate_jump(fitting_params, data_point, cord)
+        res.append(pred - data_point.measured_water_height)
+    return np.array(res)
 
-# Jump parameters
-person_weight = 137.0  # Lbs
-anchor_offset = 30.0  # ft
-
-# Derived parameters
-person_mass = person_weight/g # Slugs
-person_height = body.estimate_height_from_weight(person_weight)
-blue_cord_mass = 45 / g # slugs
-
-t_list = []
-y_list = []
-
-# Things left to fit:
-# - damping constant
-# - number of loops
-# - k constant
-
-def simulate():
-    t = 0.0
-    dt = 0.05
-    y = platform_height
-    v = 0
-    next_print = 0.0
-    print_dt = 1
-
-    lowest_height = platform_height
-
-    print(f"   t(s)         y(ft)         v(ft/s)         a(ft/s^2)         fcord(lb)         dx(ft)         fdrag")
-    while t <= t_max and y > -50:
-        delta_x = (platform_height - anchor_offset - y) - unstretched_rope_length
-        
-        #F_cord = rope_data.get_undamped_force(unstretched_rope_length + delta_x, unstretched_rope_length, blue_num_loops)
-        # This math is for cord 6552
-        percent_elongation = 100 * delta_x / unstretched_rope_length
-        F_elastic = 1.433 * percent_elongation + 120
-
-        F_damping = damping_constant * v
-        if not consider_damping: F_damping = 0.0
-
-        F_drag = 0.5 * air_density * person_drag_coefficient * person_cross_sectional_area * abs(v)*-v
-        if not consider_air_resistance: F_drag = 0.0
-        
-        a = (F_elastic + F_drag + F_damping - person_weight - blue_cord_weight/2) / (person_mass + blue_cord_mass)
-
-        if t >= next_print - 1e-12:
-            print(f"{t:6.2f}\t{y:9.2f}\t{v:9.2f}\t{a:9.2f}\t{F_elastic:9.2f}\t{delta_x:9.2f}\t{F_drag:9.2f}")
-            next_print += print_dt
-
-        #TODO: RK4 integration
-        y += dt * v
-        v += dt * a
-        t += dt
-
-        t_list.append(t)
-        y_list.append(y)
-        if y < lowest_height:
-            lowest_height = y
-    print(f"Lowest height reached: {lowest_height:.2f} ft")
-
-simulate()
-
-plt.figure(figsize=(8,6))
-plt.scatter(t_list, y_list, alpha=0.8, edgecolor="k", linewidth=0.3)
-plt.xlabel("Time (s)")
-plt.ylabel("Height (ft)")
-plt.title(f"Jump")
-plt.grid(True, linestyle="--", alpha=0.5)
-plt.tight_layout()
-plt.show()
+# Manually taken from BCI Cord Manufacturing Log
+example_cord = CordRecords.Cord(65524822, "Blue", 56 + 5/12, 530, "JumpData/PerCordData")
+print(example_cord)
+print(example_cord.jump_data)
+result = least_squares(residuals, x0=[100, 10, 1, 0], diff_step=1e-2, args=(example_cord.jump_data, example_cord))
+print("Final result is:")
+print(result)
