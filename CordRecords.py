@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 import pandas as pd
+import body
 
 # We dont have weights per individual cords, but we have rough weights per color
 yellow_cord_weight = 33
@@ -8,6 +9,9 @@ blue_num_loops = 11
 red_cord_weight = 50
 purple_cord_weight = 60
 black_cord_weight = 70
+
+# Estimate provided by Matt Lawrence
+initial_force = 100 # lb
 
 @dataclass
 class FittingParams:
@@ -21,6 +25,7 @@ class JumpDataPoint:
     mass: float  # in slugs
     anchor_offset: float  # in ft
     measured_water_height: float  # in ft
+    harness_type: str = "AF"  # default harness type
 
 class Cord:
     def __init__(self, serial_number, color, unstretched_length, force_at_300_elongation, jump_data_directory):
@@ -44,12 +49,16 @@ class Cord:
         self.unstretched_length = unstretched_length  # in ft
         self.force_at_300_elongation = force_at_300_elongation  # in lbs
         self.wasFitted = False
-        self.fitting_params = FittingParams()
         self.jump_data_directory = jump_data_directory  # Directory where per-cord jump data CSVs are stored
         self.initialize_jump_data()
-        self.jump_data = self.jump_data[:10]  # Limit to first 10 data points for testing
-        print("jump data is now: " + str(self.jump_data))
-    
+
+        k_guess = (self.force_at_300_elongation - initial_force) / (self.unstretched_length * 2) # lb / ft
+        self.fitting_params = FittingParams(k_guess, 0.1, body.person_drag_K, initial_force)
+        self.fitting_params_as_array = [self.fitting_params.spring_constant,
+                self.fitting_params.damping_constant,
+                self.fitting_params.air_resistance_coefficient,
+                self.fitting_params.constant_force]
+
     def get_weight_for_length(self, length):
         return self.weight * length / self.unstretched_length  # lbs for given length
 
@@ -64,6 +73,7 @@ class Cord:
                 mass = row['Weight'] / 32.174  # Convert weight in lbs to mass in slugs
                 anchor_offset = row['Anchor Offset']
                 measured_water_height = row['Water Height']
-                self.jump_data.append(JumpDataPoint(mass, anchor_offset, measured_water_height))
-        print("First 3 jump data points for cord " + str(self.serial_number) + ":")
-        print(self.jump_data[:3])  # Print first 5 jump data points
+                harness_type = row['Harness']
+                self.jump_data.append(JumpDataPoint(mass, anchor_offset, measured_water_height, harness_type))
+        #print("First 3 jump data points for cord " + str(self.serial_number) + ":")
+        #print(self.jump_data[:3])  # Print first 5 jump data points
