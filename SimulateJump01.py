@@ -16,10 +16,6 @@ platform_height = 194 + 3 * 1/12 # ft
 # Fair = d*|v|*v = some constant times velocity squared
 
 def simulate_jump(fitting_params, jump_data, cord, plotting=False):
-    if plotting:
-        print("Jump data is: " + str(jump_data))
-        print("Params are  : " + str(fitting_params))
-    
     person_height_estimate = body.estimate_height_from_weight(jump_data.mass * 32.174 / 32.174)  # convert slugs to lbs for weight
     harness_to_lowest_point = body.harness_to_lowest_point(jump_data.harness_type, person_height_estimate)
 
@@ -27,7 +23,7 @@ def simulate_jump(fitting_params, jump_data, cord, plotting=False):
     dt = 0.1
     t_max = 20.0
     t, v, a = 0, 0, 0
-    y, previous_y = platform_height, platform_height
+    y, previous_y, min_y = platform_height, platform_height, platform_height
     while t < t_max:
         cord_length = platform_height - jump_data.anchor_offset - y
         if cord_length < cord.unstretched_length: F_bungee = 0
@@ -37,6 +33,7 @@ def simulate_jump(fitting_params, jump_data, cord, plotting=False):
         v += a * dt
         previous_y = y
         y += v * dt
+        if y < min_y: min_y = y
         if not plotting and previous_y < y: return previous_y + harness_to_lowest_point
         t += dt
         if plotting and t % 0.2 < dt: plt.scatter(t, y + harness_to_lowest_point, color='blue')
@@ -49,4 +46,4 @@ def simulate_jump(fitting_params, jump_data, cord, plotting=False):
         plt.show()
     else:
         print("Warning: Simulation reached t_max without rebound")
-    return 999
+    return min_y

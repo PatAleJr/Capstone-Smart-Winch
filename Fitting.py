@@ -31,9 +31,15 @@ def validate_cord(cord: CordRecords.Cord, fitting_params, num_jumps: int):
     MSE = np.mean(residuals_list)
     print("MSE is: " + str(MSE))
 
+def simulate_and_plot(cord: CordRecords.Cord, fitting_params, jump: CordRecords.JumpDataPoint):
+    print("Simulating and plotting jump " + str(jump))
+    min_y = SimulateJump.simulate_jump(fitting_params, jump, cord, plotting=True)
+    print("Lowest height reached: " + str(min_y))
 
 NUM_TRAINING_JUMPS = 100
 NUM_VALIDATION_JUMPS = 50
 example_cord = CordRecords.Cord(65524822, "Blue", 56 + 5/12, 530, "JumpData/PerCordData")
 fit_result = fit_cord(example_cord, NUM_TRAINING_JUMPS)
 validate_cord(example_cord, fit_result.x, NUM_VALIDATION_JUMPS)
+
+simulate_and_plot(example_cord, fit_result.x, example_cord.jump_data[0])
