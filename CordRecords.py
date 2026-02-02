@@ -83,7 +83,7 @@ class Cord:
                 anchor_offset = row['Anchor Offset']
                 measured_water_height = row['Water Height']
                 harness_type = row['Harness']
-                had_break = 1 if 'Brk' in row else 0
+                had_break = 1 if row['Brk'] not in ['B', 'B/2', "F"] else 0
                 num_uses = row['Cord Usage Count'] if 'Cord Usage Count' in row else 0
                 self.jump_data.append(JumpDataPoint(mass, anchor_offset, measured_water_height, harness_type, had_break, num_uses))
         #print("First 3 jump data points for cord " + str(self.serial_number) + ":")

@@ -47,6 +47,11 @@ def validate_cord(cord: CordRecords.Cord, fitting_params, num_jumps: int):
     print("MSE is: " + str(MSE))
     print("RMSE is: " + str(RMSE))
 
+    worst_indices = np.argsort(sum_of_absolute_errors)[-5:][::-1]
+    print("Jumps with highest errors:")
+    for idx in worst_indices:
+        print(f"Jump: {validation_set_of_jumps[idx]}, Error: {sum_of_absolute_errors[idx]}")
+
 def simulate_and_plot(cord: CordRecords.Cord, fitting_params, jump: CordRecords.JumpDataPoint):
     print("Simulating and plotting jump " + str(jump))
     min_y = SimulateJump.simulate_jump(fitting_params, jump, cord, plotting=True)
