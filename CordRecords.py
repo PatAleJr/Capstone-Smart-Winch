@@ -45,7 +45,7 @@ class Cord:
         else:
             print()("Warning: Unknown cord color, defaulting weight to 50 lbs")
             self.weight = 50  # in lbs
-
+        self.mass = self.weight / 32.174  # in slugs
         self.unstretched_length = unstretched_length  # in ft
         self.force_at_300_elongation = force_at_300_elongation  # in lbs
         self.wasFitted = False

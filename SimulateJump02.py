@@ -6,8 +6,6 @@ import numpy as np
 import CordRecords
 import body
 
-### This is the first version of SimulateJump with basic functionality. It assumes a point mass, linear spring with damping, and quadratic air resistance.
-
 # General parameters
 g = 32.1731  # ft/s^2 (https://www.sensorsone.com/local-gravity-calculator/) -> gravity in Ottawa
 platform_height = 194 + 3 * 1/12 # ft
@@ -31,7 +29,7 @@ def simulate_jump(fitting_params, jump_data, cord, plotting=False):
         if cord_length < cord.unstretched_length: F_bungee = 0
         else: F_bungee = k * (cord_length - cord.unstretched_length) + v * d + o
         F_air = -abs(v) * v * c
-        a = (F_bungee + F_air) / jump_data.mass - g
+        a = (F_bungee + F_air) / (jump_data.mass + cord.mass /2) - g
         v += a * dt
         previous_y = y
         y += v * dt
