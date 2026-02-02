@@ -15,11 +15,15 @@ platform_height = 194 + 3 * 1/12 # ft
 # Fbungee = kx + cv + o = (linear spring) + (damping) + (constant force)
 # Fair = d*|v|*v = some constant times velocity squared
 
+# Assume k is a function of how many times the cord was used, and whether or not there was a break
+# k = spring_constant + k_had_break*had_break + k_num_uses*num_uses
+
 def simulate_jump(fitting_params, jump_data, cord, plotting=False):
     person_height_estimate = body.estimate_height_from_weight(jump_data.mass * 32.174 / 32.174)  # convert slugs to lbs for weight
     harness_to_lowest_point = body.harness_to_lowest_point(jump_data.harness_type, person_height_estimate)
 
-    k, c, d, o = fitting_params
+    k_spring, c, d, o, k_had_break, k_num_uses = fitting_params
+    k = k_spring + k_had_break * jump_data.break_occurred + k_num_uses * jump_data.num_uses
     dt = 0.1
     t_max = 20.0
     t, v, a = 0, 0, 0

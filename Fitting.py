@@ -26,7 +26,7 @@ def loss_MAE(fitting_params, jump_data, cord):
 def fit_cord(cord: CordRecords.Cord, num_jumps: int):
     print("Fitting cord " + str(cord.serial_number) + " using " + str(num_jumps) + " random jumps with loss function " + loss_function.__name__ )
     training_set_of_jumps = np.random.choice(cord.jump_data, size=num_jumps, replace=False)
-    bounds = ([0, 0, 0, 0], [np.inf, np.inf, np.inf, np.inf])  # all parameters must be non-negative
+    bounds = ([0, 0, 0, 0, 0, -np.inf], [np.inf, np.inf, np.inf, np.inf, np.inf, 0])  # all parameters must be non-negative
     result = least_squares(loss_function, x0=cord.fitting_params_as_array, diff_step=1e-2, args=(training_set_of_jumps, cord), bounds=bounds)
     print("Result of fitting: " + str(result.x))
     return result
@@ -51,9 +51,10 @@ def simulate_and_plot(cord: CordRecords.Cord, fitting_params, jump: CordRecords.
     print("Lowest height reached: " + str(min_y))
 
 loss_function = loss_MAE
-NUM_TRAINING_JUMPS = 100
+NUM_TRAINING_JUMPS = 50
 NUM_VALIDATION_JUMPS = 50
 example_cord = CordRecords.Cord(65524822, "Blue", 56 + 5/12, 530, "JumpData/PerCordData")
+#example_cord = CordRecords.Cord(66094822, "Blue", 56, 520, "JumpData/PerCordData")
 fit_result = fit_cord(example_cord, NUM_TRAINING_JUMPS)
 validate_cord(example_cord, fit_result.x, NUM_VALIDATION_JUMPS)
 

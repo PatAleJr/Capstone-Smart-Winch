@@ -19,6 +19,8 @@ class FittingParams:
     damping_constant: float = 0    # damping coefficient (lb/(ft/s))
     air_resistance_coefficient: float = 0  # air resistance coefficient
     constant_force: float = 0     # constant offset force (lb)
+    k_had_break: float = 0   # k_had_break is added to the spring constant if a break occurred. is positive
+    k_num_uses: float = 0    # number of prior uses * k_num_uses is added from spring constant. is negative
 
 @dataclass
 class JumpDataPoint:
@@ -26,6 +28,8 @@ class JumpDataPoint:
     anchor_offset: float  # in ft
     measured_water_height: float  # in ft
     harness_type: str = "AF"  # default harness type
+    break_occurred: int = 0  # 1 if a break occured before this jump
+    num_uses: int = 0  # number of times the cord has been used prior to this jump
 
 class Cord:
     def __init__(self, serial_number, color, unstretched_length, force_at_300_elongation, jump_data_directory):
@@ -57,7 +61,9 @@ class Cord:
         self.fitting_params_as_array = [self.fitting_params.spring_constant,
                 self.fitting_params.damping_constant,
                 self.fitting_params.air_resistance_coefficient,
-                self.fitting_params.constant_force]
+                self.fitting_params.constant_force,
+                self.fitting_params.k_had_break,
+                self.fitting_params.k_num_uses]
 
     def get_weight_for_length(self, length):
         return self.weight * length / self.unstretched_length  # lbs for given length
@@ -74,6 +80,8 @@ class Cord:
                 anchor_offset = row['Anchor Offset']
                 measured_water_height = row['Water Height']
                 harness_type = row['Harness']
-                self.jump_data.append(JumpDataPoint(mass, anchor_offset, measured_water_height, harness_type))
+                had_break = 1 if 'Brk' in row else 0
+                num_uses = row['Cord Usage Count'] if 'Cord Usage Count' in row else 0
+                self.jump_data.append(JumpDataPoint(mass, anchor_offset, measured_water_height, harness_type, had_break, num_uses))
         #print("First 3 jump data points for cord " + str(self.serial_number) + ":")
         #print(self.jump_data[:3])  # Print first 5 jump data points
