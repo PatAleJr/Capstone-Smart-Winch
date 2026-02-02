@@ -29,7 +29,7 @@ def simulate_jump(fitting_params, jump_data, cord, plotting=False):
     while t < t_max:
         cord_length = platform_height - jump_data.anchor_offset - y
         if cord_length < cord.unstretched_length: F_bungee = 0
-        else: F_bungee = k * (cord_length - cord.unstretched_length) + v * d + o
+        else: F_bungee = k * (cord_length - cord.unstretched_length) - v * d + o
         F_air = -abs(v) * v * c
         a = (F_bungee + F_air) / jump_data.mass - g
         v += a * dt

@@ -19,8 +19,10 @@ class FittingParams:
     damping_constant: float = 0    # damping coefficient (lb/(ft/s))
     air_resistance_coefficient: float = 0  # air resistance coefficient
     constant_force: float = 0     # constant offset force (lb)
-    k_had_break: float = 0   # k_had_break is added to the spring constant if a break occurred. is positive
-    k_num_uses: float = 0    # number of prior uses * k_num_uses is added from spring constant. is negative
+    k_had_break: float = 0   # k_had_break is added to the spring constant if a break occurred. is a positive fraction of k
+    k_num_uses: float = 0    # number of prior uses * k_num_uses is added from spring constant. is a negative fraction of k
+
+    # k_had_break and k_num_uses must be fractions of K to prevent the spring constant from going negative -> diverging result
 
 @dataclass
 class JumpDataPoint:
@@ -55,6 +57,7 @@ class Cord:
         self.wasFitted = False
         self.jump_data_directory = jump_data_directory  # Directory where per-cord jump data CSVs are stored
         self.initialize_jump_data()
+        self.number_of_jumps = max(self.jump_data, key=lambda jump: jump.num_uses).num_uses
 
         k_guess = (self.force_at_300_elongation - initial_force) / (self.unstretched_length * 2) # lb / ft
         self.fitting_params = FittingParams(k_guess, 0.1, body.person_drag_K, initial_force)
