@@ -37,7 +37,7 @@ for color in cord_colors:
     # Water heights D0 and W0 are considered 0. Remove any other non-integer entries
     df = df[df["Water Height"].astype(str).str.match(r"^-?\d+$|^D0$|^W0$")]
     df["Water Height"] = df["Water Height"].replace({"D0": 0, "W0": 0}).astype(int)
-    df = df[df["Water Height"] <= 5]
+    df = df[abs(df["Water Height"]) <= 5]
 
     print(df.head())
 
