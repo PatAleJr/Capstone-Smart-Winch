@@ -1,9 +1,4 @@
-from dataclasses import dataclass
 import matplotlib.pyplot as plt
-from scipy.integrate import solve_ivp
-from scipy.optimize import least_squares
-import numpy as np
-import CordRecords
 import body
 
 # General parameters
@@ -48,7 +43,7 @@ def simulate_jump(fitting_params, jump_data, cord, plotting=False):
         plt.ylabel("Height (ft)")
         plt.grid()
         plt.show()
-    else:
-        print("Warning: Simulation reached t_max without rebound. fitting parameters tried were: " + str(fitting_params))
-        print("Jump was : " + str(jump_data))
+    #else:
+        #print("Warning: Simulation reached t_max without rebound. fitting parameters tried were: " + str(fitting_params))
+        #print("Jump was : " + str(jump_data))
     return min_y

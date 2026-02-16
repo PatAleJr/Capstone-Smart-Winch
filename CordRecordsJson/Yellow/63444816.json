@@ -1,0 +1,26 @@
+{
+    "serial_number": 63444816,
+    "color": "Yellow",
+    "weight": 33,
+    "mass": 1.0256729035867471,
+    "unstretched_length": 56.333333333333336,
+    "force_at_300_elongation": 380.0,
+    "number_of_jumps": 102,
+    "fit_and_validate_results": [
+        {
+            "cord_serial_number": 63444816,
+            "fitting_params": {
+                "spring_constant": 2.8460365002426022,
+                "damping_constant": 0.007821366267329957,
+                "air_resistance_coefficient": 3.447539584973589e-07,
+                "constant_force": 4.27640848871569e-06,
+                "k_had_break": 2.6283897721012685e-12,
+                "k_num_uses": -5.114185750099102e-11
+            },
+            "num_jumps_trained_on": 81,
+            "MAE_from_random_validation": 8.226020155704422,
+            "MSE_from_random_validation": 401.1222711245113,
+            "num_jumps_validated_on": 20
+        }
+    ]
+}

@@ -1,0 +1,26 @@
+{
+    "serial_number": 66484828,
+    "color": "Red",
+    "weight": 50,
+    "mass": 1.5540498539193137,
+    "unstretched_length": 55.083333333333336,
+    "force_at_300_elongation": 680.0,
+    "number_of_jumps": 9,
+    "fit_and_validate_results": [
+        {
+            "cord_serial_number": 66484828,
+            "fitting_params": {
+                "spring_constant": 6.278287546237103,
+                "damping_constant": 8.509546444553249e-05,
+                "air_resistance_coefficient": 6.663093428224794e-05,
+                "constant_force": 0.00039937219652836297,
+                "k_had_break": 5.011522897143868e-15,
+                "k_num_uses": -0.00023356831063813237
+            },
+            "num_jumps_trained_on": 7,
+            "MAE_from_random_validation": 5.66051302679598,
+            "MSE_from_random_validation": 32.041407726526984,
+            "num_jumps_validated_on": 1
+        }
+    ]
+}

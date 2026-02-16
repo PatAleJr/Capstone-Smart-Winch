@@ -2,6 +2,7 @@ from dataclasses import dataclass, asdict
 import pandas as pd
 import body
 import json
+import os
 
 class FittingParams:
     spring_constant: float = 0  # spring constant (lb/ft)
@@ -67,7 +68,7 @@ class Cord:
         self.unstretched_length = unstretched_length  # in ft
         self.force_at_300_elongation = force_at_300_elongation  # in lbs
         self.initialize_jump_data()
-        self.number_of_jumps = max(self.jump_data, key=lambda jump: jump.num_uses).num_uses
+        self.number_of_jumps = self.jump_data.__len__()
         self.fit_and_validate_results = []
 
     def get_initial_fitting_params_guess(self):
@@ -103,7 +104,8 @@ class Cord:
         print("Cord " + str(self.serial_number) + " fit and validate results updated. Total fit results stored: " + str(len(self.fit_and_validate_results)))
 
     def write_json(self):
-        with open(f"{self.cord_records_json_folder}{self.serial_number}.json", 'w') as f:
+        os.makedirs(f"{self.cord_records_json_folder}{self.color}", exist_ok=True)
+        with open(f"{self.cord_records_json_folder}{self.color}/{self.serial_number}.json", 'w') as f:
             f.write(json.dumps({
             "serial_number": self.serial_number,
             "color": self.color,
@@ -111,19 +113,20 @@ class Cord:
             "mass": self.mass,
             "unstretched_length": self.unstretched_length,
             "force_at_300_elongation": self.force_at_300_elongation,
+            "number_of_jumps": self.number_of_jumps,
             "fit_and_validate_results": [fit_result.to_dict() for fit_result in self.fit_and_validate_results]
         }, indent=4))
     
     def update_from_json(self):
         try:
-            with open(f"{self.cord_records_json_folder}{self.serial_number}.json", 'r') as f:
+            with open(f"{self.cord_records_json_folder}{self.color}/{self.serial_number}.json", 'r') as f:
                 data = json.load(f)
                 self.color = data.get("color", self.color)
                 self.weight = {"Yellow": 33, "Blue": 45, "Red": 50, "Purple": 60, "Black": 70}.get(self.color, 50)
                 self.mass = self.weight / 32.174
                 self.unstretched_length = data.get("unstretched_length", self.unstretched_length)
                 self.force_at_300_elongation = data.get("force_at_300_elongation", self.force_at_300_elongation)
-
+                self.number_of_jumps = data.get("number_of_jumps", self.number_of_jumps)
                 self.fit_and_validate_results = [FittingAndValidatingResult(
                     cord_serial_number=fit_result["cord_serial_number"],
                     fitting_params=FittingParams([fit_result["fitting_params"]["spring_constant"], fit_result["fitting_params"]["damping_constant"], fit_result["fitting_params"]["air_resistance_coefficient"], fit_result["fitting_params"]["constant_force"], fit_result["fitting_params"]["k_had_break"], fit_result["fitting_params"]["k_num_uses"]]),
@@ -132,8 +135,7 @@ class Cord:
                     MSE_from_random_validation=fit_result["MSE_from_random_validation"],
                     num_jumps_validated_on=fit_result["num_jumps_validated_on"]
                 ) for fit_result in data.get("fit_and_validate_results", [])]
-                print("hi")
         except FileNotFoundError:
-            print("File not found for cord " + str(self.serial_number) + ". Will start a new recoerd for this cord.")
+            print("File not found for cord " + str(self.serial_number) + ". Will start a new record for this cord.")
         except json.JSONDecodeError:
-            print("JSON decode error for cord " + str(self.serial_number) + ". Will start a new recoerd for this cord.")
+            print("JSON decode error for cord " + str(self.serial_number) + ". Will start a new record for this cord.")

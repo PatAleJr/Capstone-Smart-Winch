@@ -1,0 +1,26 @@
+{
+    "serial_number": 65524822,
+    "color": "Blue",
+    "weight": 45,
+    "mass": 1.3986448685273825,
+    "unstretched_length": 56.416666666666664,
+    "force_at_300_elongation": 530.0,
+    "number_of_jumps": 645,
+    "fit_and_validate_results": [
+        {
+            "cord_serial_number": 65524822,
+            "fitting_params": {
+                "spring_constant": 3.959270638706759,
+                "damping_constant": 0.011540807105488824,
+                "air_resistance_coefficient": 6.068675245271095e-10,
+                "constant_force": 2.0475922556481272e-09,
+                "k_had_break": 2.4626084012468233e-15,
+                "k_num_uses": -5.458722113603587e-05
+            },
+            "num_jumps_trained_on": 516,
+            "MAE_from_random_validation": 2.73519972947166,
+            "MSE_from_random_validation": 14.161203083866965,
+            "num_jumps_validated_on": 129
+        }
+    ]
+}

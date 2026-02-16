@@ -1,0 +1,26 @@
+{
+    "serial_number": 65574834,
+    "color": "Purple",
+    "weight": 60,
+    "mass": 1.8648598247031765,
+    "unstretched_length": 55.416666666666664,
+    "force_at_300_elongation": 800.0,
+    "number_of_jumps": 135,
+    "fit_and_validate_results": [
+        {
+            "cord_serial_number": 65574834,
+            "fitting_params": {
+                "spring_constant": 6.049527650112813,
+                "damping_constant": 0.007373681955792166,
+                "air_resistance_coefficient": 1.9407907112110167e-05,
+                "constant_force": 26.23771456264282,
+                "k_had_break": 2.1525854504059736e-15,
+                "k_num_uses": -0.00023358266768542786
+            },
+            "num_jumps_trained_on": 108,
+            "MAE_from_random_validation": 2.7555708299694524,
+            "MSE_from_random_validation": 15.021604335163673,
+            "num_jumps_validated_on": 27
+        }
+    ]
+}
