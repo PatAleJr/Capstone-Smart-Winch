@@ -51,6 +51,21 @@
             "MAE_from_random_validation": 2.1737609745084066,
             "MSE_from_random_validation": 6.842520081520173,
             "num_jumps_validated_on": 27
+        },
+        {
+            "cord_serial_number": 65574834,
+            "fitting_params": {
+                "spring_constant": 6.1511051726850265,
+                "damping_constant": 0.011531223409976534,
+                "air_resistance_coefficient": 8.965367748380659e-10,
+                "constant_force": 1.7897521863546553e-05,
+                "k_had_break": 3.530720476100233e-16,
+                "k_num_uses": -0.00024074550886497715
+            },
+            "num_jumps_trained_on": 108,
+            "MAE_from_random_validation": 2.4687007114685318,
+            "MSE_from_random_validation": 11.838186121334957,
+            "num_jumps_validated_on": 27
         }
     ]
 }

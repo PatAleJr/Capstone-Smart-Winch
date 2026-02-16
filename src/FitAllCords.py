@@ -32,7 +32,8 @@ def parse_feet_inches(value):
 
 # Read BCI Cord Manufacturing Log and create lookup dictionary
 print("Reading BCI Cord Manufacturing Log...")
-bci_df = pd.read_csv("BCI Cord Manufacturing Log.csv", skiprows=1)  # Skip first header row
+    
+bci_df = pd.read_csv(os.path.join(os.path.dirname(__file__), "BCI Cord Manufacturing Log.csv"), skiprows=1)  # Skip first header row
 bci_dict = {}
 for _, row in bci_df.iterrows():
     try:
@@ -49,7 +50,7 @@ for _, row in bci_df.iterrows():
 print(f"Loaded {len(bci_dict)} cord specifications from BCI database")
 
 # Iterate through all cord data directories
-jump_data_path = Path("JumpData/PerCordData")
+jump_data_path = Path(os.path.join(os.path.dirname(__file__), "JumpData", "PerCordData"))
 cords_processed = 0
 cords_skipped = 0
 
