@@ -54,6 +54,7 @@ class JumpDataPoint:
     anchor_offset: float  # in ft
     measured_water_height: float  # in ft
     harness_type: str = "AF"  # default harness type
+    horizontal_distance: float = 0 # in ft
     break_occurred: int = 0  # 1 if a break occured before this jump
     num_uses: int = 0  # number of times the cord has been used prior to this jump
 
@@ -69,7 +70,7 @@ class Cord:
         self.force_at_300_elongation = force_at_300_elongation  # in lbs
         self.initialize_jump_data()
         self.number_of_jumps = self.jump_data.__len__()
-        self.fit_and_validate_results = []
+        self.fit_and_validate_results = [] # An array of FittingAndValidatingResult
 
     def get_initial_fitting_params_guess(self):
         initial_force = 100 # lb. Estimate provided by Matt Lawrence
@@ -91,9 +92,10 @@ class Cord:
                 anchor_offset = row['Anchor Offset']
                 measured_water_height = row['Water Height']
                 harness_type = row['Harness']
+                horizontal_distance = row['Horizontal Distance'] if 'Horizontal Distance' in row else 0
                 had_break = 1 if row['Brk'] not in ['B', 'B/2', "F"] else 0
                 num_uses = row['Cord Usage Count'] if 'Cord Usage Count' in row else 0
-                self.jump_data.append(JumpDataPoint(mass, anchor_offset, measured_water_height, harness_type, had_break, num_uses))
+                self.jump_data.append(JumpDataPoint(mass, anchor_offset, measured_water_height, harness_type, horizontal_distance, had_break, num_uses))
         #print("First 3 jump data points for cord " + str(self.serial_number) + ":")
         #print(self.jump_data[:3])  # Print first 5 jump data points
 
@@ -139,3 +141,9 @@ class Cord:
             print("File not found for cord " + str(self.serial_number) + ". Will start a new record for this cord.")
         except json.JSONDecodeError:
             print("JSON decode error for cord " + str(self.serial_number) + ". Will start a new record for this cord.")
+
+    def get_best_fitting_and_validating_params(self):
+        if not self.fit_and_validate_results:
+            return None
+        best_result = min(self.fit_and_validate_results, key=lambda result: result.MAE_from_random_validation)
+        return best_result

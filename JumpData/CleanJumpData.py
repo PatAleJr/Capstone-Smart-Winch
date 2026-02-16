@@ -39,6 +39,10 @@ for color in cord_colors:
     df["Water Height"] = df["Water Height"].replace({"D0": 0, "W0": 0}).astype(int)
     df = df[abs(df["Water Height"]) <= 5]
 
+    # For horizontal distance, replace P0 with 0, P1 with 1... and remove all other non-matching entries
+    df = df[df["Horizontal Distance"].astype(str).str.match(r"^-?\d+(\.\d+)?$|^P\d+$")]
+    df["Horizontal Distance"] = df["Horizontal Distance"].astype(str).str.replace(r"^P(\d+)$", r"\1", regex=True).astype(float)
+
     print(df.head())
 
     # Save cleaned data

@@ -1,7 +1,7 @@
 from scipy.optimize import least_squares
 import numpy as np
 import CordRecords
-import SimulateJump02 as SimulateJump
+import SimulateJump03 as SimulateJump
 
 ### Training / Fitting
 # K, C, D, O => spring constant, damping constant, air resistance coeff, constant force
