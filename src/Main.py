@@ -1,6 +1,6 @@
 import numpy as np
 import CordRecords
-import SimulateJump03 as SimulateJump
+import JumpSimulation.SimulateJump03 as SimulateJump
 import Fitting
 
 def simulate_and_plot(cord: CordRecords.Cord, jump: CordRecords.JumpDataPoint):
