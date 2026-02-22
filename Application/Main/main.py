@@ -12,14 +12,7 @@ from PySide6 import QtGui as qtg
 
 from Main.UI.main_window_ui import Ui_mw_Main
 
-# The parameters used to generate a recommendation
-@dataclass
-class PreRecommendationJumpSettings:
-    weight: int
-    height: float # in feet
-    harness: str
-    desired_water_height: float
-    planned_horizontal_distance: float
+import src.CordRecords as CordRecords
 
 class MainWindow(qtw.QMainWindow, Ui_mw_Main):
     def __init__(self):
@@ -30,6 +23,8 @@ class MainWindow(qtw.QMainWindow, Ui_mw_Main):
         self.pb_request_recommendation.clicked.connect(self.request_recommendation)
 
         # Height and weight buttons
+        self.pb_use_weight.clicked.connect(self.on_pb_use_weight_clicked)
+        self.pb_use_height.clicked.connect(self.on_pb_use_height_clicked)
 
         # Horizontal sliders
         self.hs_desired_water_height.valueChanged.connect(self.on_hs_desired_water_height_changed)
@@ -37,8 +32,23 @@ class MainWindow(qtw.QMainWindow, Ui_mw_Main):
         self.hs_planned_horizontal_distance.valueChanged.connect(self.on_hs_planned_horizontal_distance_changed)
         self.on_hs_planned_horizontal_distance_changed(self.hs_planned_horizontal_distance.value())
 
-    # Height and weight push buttons
+        # Cords
+        self.current_cords_dict = CordRecords.get_currently_used_cords()
+        for color, cord in self.current_cords_dict.items():
+            if cord is None: continue
+            for row in range(self.tb_cords.rowCount()):
+                if self.tb_cords.verticalHeaderItem(row).text() != color: continue
+                self.tb_cords.setItem(row, 0, qtw.QTableWidgetItem(str(cord.serial_number)))
+                self.tb_cords.setItem(row, 1, qtw.QTableWidgetItem(str(cord.number_of_jumps)))
+                self.tb_cords.setItem(row, 2, qtw.QTableWidgetItem("To be implemented"))
+                self.tb_cords.setItem(row, 3, qtw.QTableWidgetItem("To be implemented"))
+                break
 
+    # Height and weight push buttons
+    def on_pb_use_weight_clicked(self):
+        self.le_weight.setText(self.lb_weight_value.text())
+    def on_pb_use_height_clicked(self):
+        self.le_height.setText(self.lb_height_value.text())
 
     # Horizontal sliders
     def on_hs_desired_water_height_changed(self, value):
@@ -47,15 +57,15 @@ class MainWindow(qtw.QMainWindow, Ui_mw_Main):
         self.lb_planned_horizontal_distance_value.setText(str(value))
 
     def request_recommendation(self):
-        harness = "AF"
-        if self.rb_ancle_backward.isChecked():
-            harness = "AB"
-        elif self.rb_body_backward.isChecked():
-            harness = "BB"
-        elif self.rb_body_forward.isChecked():
-            harness = "BF"
+        if self.rb_ancle_forward.isChecked(): harness = "AF"
+        elif self.rb_ancle_backward.isChecked(): harness = "AB"
+        elif self.rb_body_backward.isChecked(): harness = "BB"
+        elif self.rb_body_forward.isChecked(): harness = "BF"
+        else: 
+            print("No harness type selected. Cannot provide a recommendation.")
+            return
 
-        selected_pre_recommendation_settings = PreRecommendationJumpSettings(
+        selected_pre_recommendation_settings = CordRecords.PreRecommendationJumpSettings(
             weight = int(self.le_weight.text()),
             height = parse_height(self.le_height.text()),
             harness = harness,
@@ -63,6 +73,14 @@ class MainWindow(qtw.QMainWindow, Ui_mw_Main):
             planned_horizontal_distance = float(self.lb_planned_horizontal_distance_value.text())
         )
         print("Requesting a recommendation for jump parameters: " + str(selected_pre_recommendation_settings))
+        for color, cord in self.current_cords_dict.items():
+            if cord is None: continue
+            recommended_anchor_offset = cord.get_recommended_anchor_offset(selected_pre_recommendation_settings)
+            if 6 < recommended_anchor_offset < 36:
+                print(f"Recommended anchor offset for cord {cord.serial_number} ({color}): {recommended_anchor_offset:.2f} ft")
+                self.lb_recommended_anchor_offset.setText(f"Anchor Offset: {recommended_anchor_offset:.2f}")
+                self.lb_recommended_cord.setText(f"Use cord: {cord.serial_number} ({color})")
+        print("No cords could provide a safe anchor offset")
 
 def parse_height(height_str: str) -> float:
     """Parse height string like "6' 2\"" into total feet as float."""

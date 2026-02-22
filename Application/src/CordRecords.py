@@ -1,10 +1,30 @@
 from dataclasses import dataclass, asdict
 import pandas as pd
-import body
+from . import body
 import json
 import os
+from .JumpSimulation import SimulateJump03 as SimulateJump
 
 DIRNAME = os.path.dirname(__file__)
+
+# The parameters used to generate a recommendation
+@dataclass
+class PreRecommendationJumpSettings:
+    weight: int
+    height: float # in feet
+    harness: str
+    desired_water_height: float
+    planned_horizontal_distance: float
+
+@dataclass
+class JumpDataPoint:
+    mass: float  # in slugs
+    anchor_offset: float  # in ft
+    measured_water_height: float  # in ft
+    harness_type: str = "AF"  # default harness type
+    horizontal_distance: float = 0 # in ft
+    break_occurred: int = 0  # 1 if a break occured before this jump
+    num_uses: int = 0  # number of times the cord has been used prior to this jump
 
 class FittingParams:
     spring_constant: float = 0  # spring constant (lb/ft)
@@ -50,16 +70,6 @@ class FittingAndValidatingResult:
         d['fitting_params'] = self.fitting_params.to_dict()
         return d
 
-@dataclass
-class JumpDataPoint:
-    mass: float  # in slugs
-    anchor_offset: float  # in ft
-    measured_water_height: float  # in ft
-    harness_type: str = "AF"  # default harness type
-    horizontal_distance: float = 0 # in ft
-    break_occurred: int = 0  # 1 if a break occured before this jump
-    num_uses: int = 0  # number of times the cord has been used prior to this jump
-
 class Cord:
     def __init__(self, serial_number, color, unstretched_length, force_at_300_elongation):
         self.serial_number = serial_number
@@ -69,7 +79,7 @@ class Cord:
         self.unstretched_length = unstretched_length  # in ft
         self.force_at_300_elongation = force_at_300_elongation  # in lbs
         self.initialize_jump_data()
-        self.number_of_jumps = self.jump_data.__len__()
+        self.number_of_jumps = max(self.jump_data, key = lambda jump: jump.num_uses).num_uses + 1 if self.jump_data else 0
         self.fit_and_validate_results = [] # An array of FittingAndValidatingResult
 
     def get_initial_fitting_params_guess(self):
@@ -149,3 +159,51 @@ class Cord:
             return None
         best_result = min(self.fit_and_validate_results, key=lambda result: result.MAE_from_random_validation)
         return best_result
+
+    def get_recommended_anchor_offset(self, pre_recommendation_jump_settings: PreRecommendationJumpSettings):
+        best_fitting_and_validating_params = self.get_best_fitting_and_validating_params()
+        if best_fitting_and_validating_params is None:
+            print("No fitting and validating results found for cord " + str(self.serial_number) + ". Cannot provide recommendation.")
+            return None
+        best_fitting_params = best_fitting_and_validating_params.fitting_params
+        dummy_jump = JumpDataPoint(
+            mass = pre_recommendation_jump_settings.weight / 32.174,
+            anchor_offset = 0,
+            measured_water_height = 0,
+            harness_type = pre_recommendation_jump_settings.harness,
+            horizontal_distance = pre_recommendation_jump_settings.planned_horizontal_distance,
+            break_occurred = 0,
+            num_uses = self.number_of_jumps)
+        water_height_with_zero_anchor_offset = SimulateJump.simulate_jump(best_fitting_params.to_array(), dummy_jump, self)
+        required_anchor_offset = water_height_with_zero_anchor_offset - pre_recommendation_jump_settings.desired_water_height
+        return required_anchor_offset
+
+def get_all_cord_records_from_jsons():
+    cord_records = []
+    cord_records_path = os.path.join(DIRNAME, "CordRecordsJson")
+    for color_dir in os.listdir(cord_records_path):
+        color_dir_path = os.path.join(cord_records_path, color_dir)
+        if os.path.isdir(color_dir_path):
+            for json_file in os.listdir(color_dir_path):
+                if json_file.endswith(".json"):
+                    serial_number = int(json_file[:-5])  # Remove .json extension
+                    try:
+                        with open(os.path.join(color_dir_path, json_file), 'r') as f:
+                            data = json.load(f)
+                            cord = Cord(serial_number, data.get("color", "Unknown"), data.get("unstretched_length", 0), data.get("force_at_300_elongation", 0))
+                            cord.update_from_json()  # Update cord with all details from JSON
+                            cord_records.append(cord)
+                    except (FileNotFoundError, json.JSONDecodeError) as e:
+                        print(f"Error loading cord record from {json_file}: {e}")
+    return cord_records
+
+# Returns a dictionary mapping cord colors to a cord of that color that has been fit and validated at least once
+def get_currently_used_cords():
+    all_cords = get_all_cord_records_from_jsons()
+    color_to_cord = {"Yellow": None, "Blue": None, "Red": None, "Purple": None, "Black": None}
+    for cord in all_cords:
+        if cord.fit_and_validate_results.__len__() == 0: continue  # Only consider cords that have been fit and validated at least once
+        if cord.color in color_to_cord and color_to_cord[cord.color] is None:
+            color_to_cord[cord.color] = cord
+    print(color_to_cord)
+    return color_to_cord

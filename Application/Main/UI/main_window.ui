@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1297</width>
+    <width>1098</width>
     <height>867</height>
    </rect>
   </property>
@@ -438,12 +438,12 @@
            </row>
            <row>
             <property name="text">
-             <string>Red</string>
+             <string>Blue</string>
             </property>
            </row>
            <row>
             <property name="text">
-             <string>Blue</string>
+             <string>Red</string>
             </property>
            </row>
            <row>
@@ -525,7 +525,7 @@
           </property>
           <layout class="QGridLayout" name="gridLayout_5">
            <item row="1" column="0">
-            <widget class="QLabel" name="lb_recommended_cord_color">
+            <widget class="QLabel" name="lb_recommended_cord">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
                <horstretch>0</horstretch>
@@ -539,12 +539,12 @@
               </font>
              </property>
              <property name="text">
-              <string>Cord Color: Red</string>
+              <string>Use cord:</string>
              </property>
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QLabel" name="lb_suggested_anchor_offset">
+            <widget class="QLabel" name="lb_recommended_anchor_offset">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
                <horstretch>0</horstretch>
@@ -813,7 +813,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1297</width>
+     <width>1098</width>
      <height>33</height>
     </rect>
    </property>

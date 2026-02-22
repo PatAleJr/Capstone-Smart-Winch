@@ -66,6 +66,36 @@
             "MAE_from_random_validation": 3.1538839277784794,
             "MSE_from_random_validation": 23.069262190557183,
             "num_jumps_validated_on": 129
+        },
+        {
+            "cord_serial_number": 65524822,
+            "fitting_params": {
+                "spring_constant": 3.8926634307192707,
+                "damping_constant": 0.012460068089335273,
+                "air_resistance_coefficient": 4.91020249113989e-08,
+                "constant_force": 7.805712563883918e-08,
+                "k_had_break": 1.9569418789821513e-14,
+                "k_num_uses": -5.3023333718072e-05
+            },
+            "num_jumps_trained_on": 516,
+            "MAE_from_random_validation": 2.43602196471135,
+            "MSE_from_random_validation": 11.177489729180738,
+            "num_jumps_validated_on": 129
+        },
+        {
+            "cord_serial_number": 65524822,
+            "fitting_params": {
+                "spring_constant": 3.8763842678492355,
+                "damping_constant": 0.012972322378528866,
+                "air_resistance_coefficient": 3.3465589290941672e-12,
+                "constant_force": 2.8037918041035694e-15,
+                "k_had_break": 6.606369847542085e-17,
+                "k_num_uses": -6.188794737171774e-05
+            },
+            "num_jumps_trained_on": 516,
+            "MAE_from_random_validation": 3.083119150354006,
+            "MSE_from_random_validation": 16.91326317702552,
+            "num_jumps_validated_on": 129
         }
     ]
 }

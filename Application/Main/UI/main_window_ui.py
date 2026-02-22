@@ -28,7 +28,7 @@ class Ui_mw_Main(object):
     def setupUi(self, mw_Main):
         if not mw_Main.objectName():
             mw_Main.setObjectName(u"mw_Main")
-        mw_Main.resize(1297, 867)
+        mw_Main.resize(1098, 867)
         font = QFont()
         font.setPointSize(12)
         mw_Main.setFont(font)
@@ -313,24 +313,24 @@ class Ui_mw_Main(object):
         self.gb_cord_recommendations.setFont(font1)
         self.gridLayout_5 = QGridLayout(self.gb_cord_recommendations)
         self.gridLayout_5.setObjectName(u"gridLayout_5")
-        self.lb_recommended_cord_color = QLabel(self.gb_cord_recommendations)
-        self.lb_recommended_cord_color.setObjectName(u"lb_recommended_cord_color")
+        self.lb_recommended_cord = QLabel(self.gb_cord_recommendations)
+        self.lb_recommended_cord.setObjectName(u"lb_recommended_cord")
         sizePolicy5 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum)
         sizePolicy5.setHorizontalStretch(0)
         sizePolicy5.setVerticalStretch(0)
-        sizePolicy5.setHeightForWidth(self.lb_recommended_cord_color.sizePolicy().hasHeightForWidth())
-        self.lb_recommended_cord_color.setSizePolicy(sizePolicy5)
-        self.lb_recommended_cord_color.setFont(font2)
+        sizePolicy5.setHeightForWidth(self.lb_recommended_cord.sizePolicy().hasHeightForWidth())
+        self.lb_recommended_cord.setSizePolicy(sizePolicy5)
+        self.lb_recommended_cord.setFont(font2)
 
-        self.gridLayout_5.addWidget(self.lb_recommended_cord_color, 1, 0, 1, 1)
+        self.gridLayout_5.addWidget(self.lb_recommended_cord, 1, 0, 1, 1)
 
-        self.lb_suggested_anchor_offset = QLabel(self.gb_cord_recommendations)
-        self.lb_suggested_anchor_offset.setObjectName(u"lb_suggested_anchor_offset")
-        sizePolicy5.setHeightForWidth(self.lb_suggested_anchor_offset.sizePolicy().hasHeightForWidth())
-        self.lb_suggested_anchor_offset.setSizePolicy(sizePolicy5)
-        self.lb_suggested_anchor_offset.setFont(font2)
+        self.lb_recommended_anchor_offset = QLabel(self.gb_cord_recommendations)
+        self.lb_recommended_anchor_offset.setObjectName(u"lb_recommended_anchor_offset")
+        sizePolicy5.setHeightForWidth(self.lb_recommended_anchor_offset.sizePolicy().hasHeightForWidth())
+        self.lb_recommended_anchor_offset.setSizePolicy(sizePolicy5)
+        self.lb_recommended_anchor_offset.setFont(font2)
 
-        self.gridLayout_5.addWidget(self.lb_suggested_anchor_offset, 1, 1, 1, 1)
+        self.gridLayout_5.addWidget(self.lb_recommended_anchor_offset, 1, 1, 1, 1)
 
         self.pb_request_recommendation = QPushButton(self.gb_cord_recommendations)
         self.pb_request_recommendation.setObjectName(u"pb_request_recommendation")
@@ -460,7 +460,7 @@ class Ui_mw_Main(object):
         mw_Main.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(mw_Main)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1297, 33))
+        self.menubar.setGeometry(QRect(0, 0, 1098, 33))
         self.menuFile = QMenu(self.menubar)
         self.menuFile.setObjectName(u"menuFile")
         self.menuPerson = QMenu(self.menubar)
@@ -516,17 +516,17 @@ class Ui_mw_Main(object):
         ___qtablewidgetitem4 = self.tb_cords.verticalHeaderItem(0)
         ___qtablewidgetitem4.setText(QCoreApplication.translate("mw_Main", u"Yellow", None));
         ___qtablewidgetitem5 = self.tb_cords.verticalHeaderItem(1)
-        ___qtablewidgetitem5.setText(QCoreApplication.translate("mw_Main", u"Red", None));
+        ___qtablewidgetitem5.setText(QCoreApplication.translate("mw_Main", u"Blue", None));
         ___qtablewidgetitem6 = self.tb_cords.verticalHeaderItem(2)
-        ___qtablewidgetitem6.setText(QCoreApplication.translate("mw_Main", u"Blue", None));
+        ___qtablewidgetitem6.setText(QCoreApplication.translate("mw_Main", u"Red", None));
         ___qtablewidgetitem7 = self.tb_cords.verticalHeaderItem(3)
         ___qtablewidgetitem7.setText(QCoreApplication.translate("mw_Main", u"Purple", None));
         ___qtablewidgetitem8 = self.tb_cords.verticalHeaderItem(4)
         ___qtablewidgetitem8.setText(QCoreApplication.translate("mw_Main", u"Black", None));
         self.pb_update_cords.setText(QCoreApplication.translate("mw_Main", u"Update Cords", None))
         self.gb_cord_recommendations.setTitle(QCoreApplication.translate("mw_Main", u"Cord Recommendation", None))
-        self.lb_recommended_cord_color.setText(QCoreApplication.translate("mw_Main", u"Cord Color: Red", None))
-        self.lb_suggested_anchor_offset.setText(QCoreApplication.translate("mw_Main", u"Anchor Offset: 12' 5\"", None))
+        self.lb_recommended_cord.setText(QCoreApplication.translate("mw_Main", u"Use cord:", None))
+        self.lb_recommended_anchor_offset.setText(QCoreApplication.translate("mw_Main", u"Anchor Offset: 12' 5\"", None))
         self.pb_request_recommendation.setText(QCoreApplication.translate("mw_Main", u"Request Recommendation", None))
         self.gb_anchor_offset.setTitle(QCoreApplication.translate("mw_Main", u"Anchor Offset", None))
         self.lb_current_anchor_offset.setText(QCoreApplication.translate("mw_Main", u"Current Value:", None))

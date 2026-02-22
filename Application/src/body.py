@@ -1,6 +1,3 @@
-import numpy as np
-import pandas as pd
-
 # Body proportions
 avg_ape_index = 1.0  # average ape index (arm span / height)
 avg_shoulder_span = 0.25  # proportion of height (I used myself as reference)

@@ -1,11 +1,12 @@
 import matplotlib.pyplot as plt
-import body
 import math
+from src import body
 
 # General parameters
 g = 32.1731  # ft/s^2 (https://www.sensorsone.com/local-gravity-calculator/) -> gravity in Ottawa
 platform_height = 194 + 3 * 1/12 # ft
 
+# Returns predicted water height of a jump, with the option of plotting the trajectory
 # Jump is modelled like mx'' = mg - Fbungee(x, x') - Fair(x')
 # We need to fit parameters for Fbungee and Fair
 # Fbungee = kx + cv + o = (linear spring) + (damping) + (constant force)
