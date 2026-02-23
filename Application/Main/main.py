@@ -1,7 +1,5 @@
 import sys
 import os
-from dataclasses import dataclass
-from enum import Enum
 
 # Add parent Application directory to path so Icons_rc can be imported
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -12,7 +10,11 @@ from PySide6 import QtGui as qtg
 
 from Main.UI.main_window_ui import Ui_mw_Main
 
-import src.CordRecords as CordRecords
+import CordRecords
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
+import matplotlib
+matplotlib.use('QtAgg')
 
 class MainWindow(qtw.QMainWindow, Ui_mw_Main):
     def __init__(self):
@@ -20,6 +22,12 @@ class MainWindow(qtw.QMainWindow, Ui_mw_Main):
         self.setupUi(self)
         self.show()
 
+        # Predicted trajectory figure setup
+        self.predicted_trajectory_figure = Figure(figsize=(5, 4), dpi=100)
+        canvas = FigureCanvas(self.predicted_trajectory_figure)
+        self.layout_predicted_trajectory.addWidget(canvas)
+
+        # Jump recommendation button
         self.pb_request_recommendation.clicked.connect(self.request_recommendation)
 
         # Height and weight buttons
@@ -80,6 +88,11 @@ class MainWindow(qtw.QMainWindow, Ui_mw_Main):
                 print(f"Recommended anchor offset for cord {cord.serial_number} ({color}): {recommended_anchor_offset:.2f} ft")
                 self.lb_recommended_anchor_offset.setText(f"Anchor Offset: {recommended_anchor_offset:.2f}")
                 self.lb_recommended_cord.setText(f"Use cord: {cord.serial_number} ({color})")
+
+                self.predicted_trajectory_figure.clear()
+                cord.simulate_and_plot_jump(selected_pre_recommendation_settings, recommended_anchor_offset, figure=self.predicted_trajectory_figure)
+                return
+
         print("No cords could provide a safe anchor offset")
 
 def parse_height(height_str: str) -> float:
@@ -89,7 +102,7 @@ def parse_height(height_str: str) -> float:
     inches = int(parts[1].strip()) if len(parts) > 1 and parts[1].strip() else 0
     return feet + inches / 12
 
-if __name__ == "__main__":
+if __name__ == "__main__":   
     app = qtw.QApplication(sys.argv)
     window= MainWindow()
     sys.exit(app.exec())

@@ -414,15 +414,10 @@ class Ui_mw_Main(object):
         self.gb_predicted_trajectory.setFont(font1)
         self.gridLayout = QGridLayout(self.gb_predicted_trajectory)
         self.gridLayout.setObjectName(u"gridLayout")
-        self.w_jump_plot = QWidget(self.gb_predicted_trajectory)
-        self.w_jump_plot.setObjectName(u"w_jump_plot")
-        sizePolicy7 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
-        sizePolicy7.setHorizontalStretch(0)
-        sizePolicy7.setVerticalStretch(0)
-        sizePolicy7.setHeightForWidth(self.w_jump_plot.sizePolicy().hasHeightForWidth())
-        self.w_jump_plot.setSizePolicy(sizePolicy7)
+        self.layout_predicted_trajectory = QGridLayout()
+        self.layout_predicted_trajectory.setObjectName(u"layout_predicted_trajectory")
 
-        self.gridLayout.addWidget(self.w_jump_plot, 0, 0, 1, 1)
+        self.gridLayout.addLayout(self.layout_predicted_trajectory, 0, 0, 1, 1)
 
 
         self.hl_bottom.addWidget(self.gb_predicted_trajectory)
@@ -535,7 +530,7 @@ class Ui_mw_Main(object):
         self.pb_set_recommended_anchor_offset.setText(QCoreApplication.translate("mw_Main", u"Set recommended", None))
         self.pb_set_custom_anchor_offset.setText(QCoreApplication.translate("mw_Main", u"Set custom:", None))
         self.pb_jump.setText(QCoreApplication.translate("mw_Main", u"Jump!", None))
-        self.gb_predicted_trajectory.setTitle(QCoreApplication.translate("mw_Main", u"Predicted Trajectory", None))
+        self.gb_predicted_trajectory.setTitle(QCoreApplication.translate("mw_Main", u"Predicted Trajectory For Recommendation", None))
         self.gb_similar_jumps.setTitle(QCoreApplication.translate("mw_Main", u"Similar Jumps", None))
         ___qtablewidgetitem9 = self.tb_similar_jumps.horizontalHeaderItem(0)
         ___qtablewidgetitem9.setText(QCoreApplication.translate("mw_Main", u"Serial #", None));

@@ -734,18 +734,11 @@
          </font>
         </property>
         <property name="title">
-         <string>Predicted Trajectory</string>
+         <string>Predicted Trajectory For Recommendation</string>
         </property>
         <layout class="QGridLayout" name="gridLayout">
          <item row="0" column="0">
-          <widget class="QWidget" name="w_jump_plot" native="true">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
+          <layout class="QGridLayout" name="layout_predicted_trajectory"/>
          </item>
         </layout>
        </widget>

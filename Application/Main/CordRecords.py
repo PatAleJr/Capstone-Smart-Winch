@@ -1,10 +1,9 @@
+import os
 from dataclasses import dataclass, asdict
 import pandas as pd
-from . import body
+import body
 import json
-import os
-from .JumpSimulation import SimulateJump03 as SimulateJump
-
+from JumpSimulation import SimulateJump03 as SimulateJump
 DIRNAME = os.path.dirname(__file__)
 
 # The parameters used to generate a recommendation
@@ -177,6 +176,22 @@ class Cord:
         water_height_with_zero_anchor_offset = SimulateJump.simulate_jump(best_fitting_params.to_array(), dummy_jump, self)
         required_anchor_offset = water_height_with_zero_anchor_offset - pre_recommendation_jump_settings.desired_water_height
         return required_anchor_offset
+    
+    def simulate_and_plot_jump(self, pre_recommendation_jump_settings: PreRecommendationJumpSettings, anchor_offset, figure):
+        best_fitting_and_validating_params = self.get_best_fitting_and_validating_params()
+        if best_fitting_and_validating_params is None:
+            print("No fitting and validating results found for cord " + str(self.serial_number) + ". Cannot simulate jump.")
+            return None
+        best_fitting_params = best_fitting_and_validating_params.fitting_params
+        dummy_jump = JumpDataPoint(
+            mass = pre_recommendation_jump_settings.weight / 32.174,
+            anchor_offset = anchor_offset,
+            measured_water_height = 0,
+            harness_type = pre_recommendation_jump_settings.harness,
+            horizontal_distance = pre_recommendation_jump_settings.planned_horizontal_distance,
+            break_occurred = 0,
+            num_uses = self.number_of_jumps)
+        SimulateJump.simulate_jump(best_fitting_params.to_array(), dummy_jump, self, plotting=True, figure=figure)
 
 def get_all_cord_records_from_jsons():
     cord_records = []

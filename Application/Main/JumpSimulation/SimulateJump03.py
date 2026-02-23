@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import math
-from src import body
+import body
 
 # General parameters
 g = 32.1731  # ft/s^2 (https://www.sensorsone.com/local-gravity-calculator/) -> gravity in Ottawa
@@ -17,7 +17,7 @@ platform_height = 194 + 3 * 1/12 # ft
 
 # This model considers horizontal distance
 
-def simulate_jump(fitting_params, jump_data, cord, plotting=False): # Takes fitting params as an array
+def simulate_jump(fitting_params, jump_data, cord, plotting=False, figure=None): # Takes fitting params as an array
     person_height_estimate = body.estimate_height_from_weight(jump_data.mass * 32.174 / 32.174)  # convert slugs to lbs for weight
     harness_to_lowest_point = body.harness_to_lowest_point(jump_data.harness_type, person_height_estimate)
 
@@ -70,13 +70,35 @@ def simulate_jump(fitting_params, jump_data, cord, plotting=False): # Takes fitt
             plot_times.append(t)
 
     if plotting:
-        scatter = plt.scatter(plot_points_x, plot_points_y, c=plot_times, cmap='coolwarm', s=20)
-        plt.colorbar(scatter, label='Time (s)')
-        plt.title("Jump Simulation: Height vs Distance per time")
-        plt.xlabel("Distance (ft)")
-        plt.ylabel("Height (ft)")
-        plt.grid()
-        plt.show()
+        # Accept either a Figure or an Axes as 'figure' argument and draw directly into its axes.
+        created_fig = False
+        if figure is None:
+            fig, ax = plt.subplots(figsize=(5, 4), dpi=100)
+            created_fig = True
+        elif hasattr(figure, "add_subplot") and isinstance(figure, plt.Figure):
+            fig = figure
+            ax = fig.gca()
+        else:
+            # fallback
+            fig, ax = plt.subplots(figsize=(5, 4), dpi=100)
+            created_fig = True
+
+        scatter = ax.scatter(plot_points_x, plot_points_y, c=plot_times, cmap='coolwarm', s=20)
+        fig.colorbar(scatter, ax=ax, label='Time (s)')
+        ax.set_title("Jump Simulation: Height vs Distance per time")
+        ax.set_xlabel("Distance (ft)")
+        ax.set_xlim(min(-5, ax.get_xlim()[0]), max(5, ax.get_xlim()[1])) # Don't zoom in ridiculously if the jump is short
+        ax.set_ylabel("Height (ft)")
+        ax.grid(True)
+
+        # Only show if we created the figure locally; otherwise caller is responsible for embedding/updating the canvas.
+        if created_fig:
+            plt.show()
+        else:
+            try:
+                fig.canvas.draw_idle()
+            except Exception:
+                pass
     #else:
         #print("Warning: Simulation reached t_max without rebound. fitting parameters tried were: " + str(fitting_params))
         #print("Jump was : " + str(jump_data))
