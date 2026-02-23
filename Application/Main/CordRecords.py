@@ -1,6 +1,7 @@
 import os
 from dataclasses import dataclass, asdict
 import pandas as pd
+import scipy.optimize
 import body
 import json
 from JumpSimulation import SimulateJump03 as SimulateJump
@@ -160,11 +161,14 @@ class Cord:
         return best_result
 
     def get_recommended_anchor_offset(self, pre_recommendation_jump_settings: PreRecommendationJumpSettings):
+        # Fitting parameters as an array
         best_fitting_and_validating_params = self.get_best_fitting_and_validating_params()
         if best_fitting_and_validating_params is None:
             print("No fitting and validating results found for cord " + str(self.serial_number) + ". Cannot provide recommendation.")
             return None
-        best_fitting_params = best_fitting_and_validating_params.fitting_params
+        best_fitting_params_arr = best_fitting_and_validating_params.fitting_params.to_array()
+
+        # Create a dummy jump data point
         dummy_jump = JumpDataPoint(
             mass = pre_recommendation_jump_settings.weight / 32.174,
             anchor_offset = 0,
@@ -173,9 +177,21 @@ class Cord:
             horizontal_distance = pre_recommendation_jump_settings.planned_horizontal_distance,
             break_occurred = 0,
             num_uses = self.number_of_jumps)
-        water_height_with_zero_anchor_offset = SimulateJump.simulate_jump(best_fitting_params.to_array(), dummy_jump, self)
-        required_anchor_offset = water_height_with_zero_anchor_offset - pre_recommendation_jump_settings.desired_water_height
-        return required_anchor_offset
+        
+        # Use water_height when anchor_offset is 0 as an initial guess
+        # This is not the final recommended anchor offset because this is a non-linear system: 10ft water height != 10 ft anchor offset
+        water_height_with_zero_anchor_offset = SimulateJump.simulate_jump(best_fitting_params_arr, dummy_jump, self)
+        required_anchor_offset_guess = water_height_with_zero_anchor_offset - pre_recommendation_jump_settings.desired_water_height
+
+        # Iterate to find the anchor offset that results in the desired water height within a certain tolerance
+        def difference_between_actual_and_desired_water_height(anchor_offset):
+            dummy_jump.anchor_offset = anchor_offset[0]
+            simulated_water_height = SimulateJump.simulate_jump(best_fitting_params_arr, dummy_jump, self)
+            return abs(simulated_water_height - pre_recommendation_jump_settings.desired_water_height)
+        result = scipy.optimize.minimize(difference_between_actual_and_desired_water_height, x0=[required_anchor_offset_guess], bounds=[(0, 50)])
+        recommended_anchor_offset = result.x[0]
+
+        return recommended_anchor_offset
     
     def simulate_and_plot_jump(self, pre_recommendation_jump_settings: PreRecommendationJumpSettings, anchor_offset, figure):
         best_fitting_and_validating_params = self.get_best_fitting_and_validating_params()
