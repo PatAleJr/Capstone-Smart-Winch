@@ -25,6 +25,7 @@ class JumpDataPoint:
     horizontal_distance: float = 0 # in ft
     break_occurred: int = 0  # 1 if a break occured before this jump
     num_uses: int = 0  # number of times the cord has been used prior to this jump
+    date: str = ""  # date of the jump
 
 class FittingParams:
     spring_constant: float = 0  # spring constant (lb/ft)
@@ -106,7 +107,8 @@ class Cord:
                 horizontal_distance = row['Horizontal Distance'] if 'Horizontal Distance' in row else 0
                 had_break = 1 if row['Brk'] not in ['B', 'B/2', "F"] else 0
                 num_uses = row['Cord Usage Count'] if 'Cord Usage Count' in row else 0
-                self.jump_data.append(JumpDataPoint(mass, anchor_offset, measured_water_height, harness_type, horizontal_distance, had_break, num_uses))
+                date = row['Date'] if 'Date' in row else "Date not provided"
+                self.jump_data.append(JumpDataPoint(mass, anchor_offset, measured_water_height, harness_type, horizontal_distance, had_break, num_uses, date))
         #print("First 3 jump data points for cord " + str(self.serial_number) + ":")
         #print(self.jump_data[:3])  # Print first 5 jump data points
 
@@ -193,21 +195,34 @@ class Cord:
 
         return recommended_anchor_offset
     
-    def simulate_and_plot_jump(self, pre_recommendation_jump_settings: PreRecommendationJumpSettings, anchor_offset, figure):
+    def simulate_and_plot_jump(self, jump: JumpDataPoint, figure):
         best_fitting_and_validating_params = self.get_best_fitting_and_validating_params()
         if best_fitting_and_validating_params is None:
             print("No fitting and validating results found for cord " + str(self.serial_number) + ". Cannot simulate jump.")
             return None
         best_fitting_params = best_fitting_and_validating_params.fitting_params
-        dummy_jump = JumpDataPoint(
-            mass = pre_recommendation_jump_settings.weight / 32.174,
-            anchor_offset = anchor_offset,
-            measured_water_height = 0,
-            harness_type = pre_recommendation_jump_settings.harness,
-            horizontal_distance = pre_recommendation_jump_settings.planned_horizontal_distance,
-            break_occurred = 0,
-            num_uses = self.number_of_jumps)
-        SimulateJump.simulate_jump(best_fitting_params.to_array(), dummy_jump, self, plotting=True, figure=figure)
+        SimulateJump.simulate_jump(best_fitting_params.to_array(), jump, self, plotting=True, figure=figure)
+
+    def get_similar_jumps(self, jump: JumpDataPoint, num_similar_jumps=2):
+        # Iterate through all jump data points backwards
+        print("Finding similar jumps for jump: " + str(jump))
+        weight_tolerances = [3, 5, 9]
+        horizontal_distance_tolerances = [3, 5, 10]
+        water_height_limits = [-1, 3]
+        number_of_jumps_can_look_back_at = 50
+        similar_jumps = []
+        for iteration in range(3):  # First use strict tolerances, then relax them if not enough similar jumps are found
+          for jump_data_point in reversed(self.jump_data[-number_of_jumps_can_look_back_at:]):
+                weight_within_tolerance = abs(jump_data_point.mass - jump.mass) * 32.174 <= weight_tolerances[iteration]
+                horizontal_distance_within_tolerance = abs(jump_data_point.horizontal_distance - jump.horizontal_distance) <= horizontal_distance_tolerances[iteration]
+                is_within_water_height_limits = water_height_limits[0] <= jump_data_point.measured_water_height <= water_height_limits[1]
+                harness_type_matches = jump_data_point.harness_type == jump.harness_type
+                if weight_within_tolerance and horizontal_distance_within_tolerance and is_within_water_height_limits and harness_type_matches:
+                    similar_jumps.append(jump_data_point)
+                    if len(similar_jumps) >= num_similar_jumps: 
+                        print("Similar jumps found: " + str(similar_jumps))
+                        return similar_jumps
+        return similar_jumps
 
 def get_all_cord_records_from_jsons():
     cord_records = []

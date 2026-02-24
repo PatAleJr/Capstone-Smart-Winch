@@ -73,6 +73,7 @@ class MainWindow(qtw.QMainWindow, Ui_mw_Main):
             print("No harness type selected. Cannot provide a recommendation.")
             return
 
+        # Collect inputs
         selected_pre_recommendation_settings = CordRecords.PreRecommendationJumpSettings(
             weight = int(self.le_weight.text()),
             height = parse_height(self.le_height.text()),
@@ -80,17 +81,42 @@ class MainWindow(qtw.QMainWindow, Ui_mw_Main):
             desired_water_height = float(self.lb_desired_water_height_value.text()),
             planned_horizontal_distance = float(self.lb_planned_horizontal_distance_value.text())
         )
+
+        # Come up with a recommendation
         print("Requesting a recommendation for jump parameters: " + str(selected_pre_recommendation_settings))
         for color, cord in self.current_cords_dict.items():
             if cord is None: continue
             recommended_anchor_offset = cord.get_recommended_anchor_offset(selected_pre_recommendation_settings)
             if 6 < recommended_anchor_offset < 36:
+                # Update the UI with the recommendation
                 print(f"Recommended anchor offset for cord {cord.serial_number} ({color}): {recommended_anchor_offset:.2f} ft")
                 self.lb_recommended_anchor_offset.setText(f"Anchor Offset: {recommended_anchor_offset:.2f}")
                 self.lb_recommended_cord.setText(f"Use cord: {cord.serial_number} ({color})")
 
+                dummy_jump = CordRecords.JumpDataPoint(
+                    mass=selected_pre_recommendation_settings.weight / 32.174,  # convert weight in lbs to mass in slugs
+                    anchor_offset=recommended_anchor_offset,
+                    measured_water_height=selected_pre_recommendation_settings.desired_water_height,
+                    harness_type=selected_pre_recommendation_settings.harness,
+                    horizontal_distance=selected_pre_recommendation_settings.planned_horizontal_distance,
+                    break_occurred=0,
+                    num_uses=cord.number_of_jumps,
+                    date = "N/A")
+
+                # Plot the jump
                 self.predicted_trajectory_figure.clear()
-                cord.simulate_and_plot_jump(selected_pre_recommendation_settings, recommended_anchor_offset, figure=self.predicted_trajectory_figure)
+                cord.simulate_and_plot_jump(dummy_jump, figure=self.predicted_trajectory_figure)
+
+                # Update similar jumps table
+                similar_jumps = cord.get_similar_jumps(dummy_jump, 3)
+                for jump_index, jump in enumerate(similar_jumps):
+                    print("Harness type: " + jump.harness_type)
+                    self.tb_similar_jumps.setItem(jump_index, 0, qtw.QTableWidgetItem(jump.date))
+                    self.tb_similar_jumps.setItem(jump_index, 1, qtw.QTableWidgetItem(str(jump.mass * 32.174)))  # convert mass in slugs back to weight in lbs for display
+                    self.tb_similar_jumps.setItem(jump_index, 2, qtw.QTableWidgetItem(str(jump.anchor_offset)))
+                    self.tb_similar_jumps.setItem(jump_index, 3, qtw.QTableWidgetItem(str(jump.horizontal_distance)))
+                    self.tb_similar_jumps.setItem(jump_index, 4, qtw.QTableWidgetItem(str(jump.measured_water_height)))
+                    self.tb_similar_jumps.setItem(jump_index, 5, qtw.QTableWidgetItem(str(jump.harness_type)))
                 return
 
         print("No cords could provide a safe anchor offset")

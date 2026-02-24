@@ -18,17 +18,16 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QTransform)
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QGridLayout, QGroupBox,
     QHBoxLayout, QHeaderView, QLabel, QLineEdit,
-    QMainWindow, QMenu, QMenuBar, QPushButton,
-    QRadioButton, QSizePolicy, QSlider, QSpacerItem,
-    QStatusBar, QTableWidget, QTableWidgetItem, QVBoxLayout,
-    QWidget)
+    QMainWindow, QPushButton, QRadioButton, QSizePolicy,
+    QSlider, QSpacerItem, QStatusBar, QTableWidget,
+    QTableWidgetItem, QVBoxLayout, QWidget)
 import Icons_rc
 
 class Ui_mw_Main(object):
     def setupUi(self, mw_Main):
         if not mw_Main.objectName():
             mw_Main.setObjectName(u"mw_Main")
-        mw_Main.resize(1098, 867)
+        mw_Main.resize(1306, 867)
         font = QFont()
         font.setPointSize(12)
         mw_Main.setFont(font)
@@ -428,8 +427,8 @@ class Ui_mw_Main(object):
         self.gridLayout_6 = QGridLayout(self.gb_similar_jumps)
         self.gridLayout_6.setObjectName(u"gridLayout_6")
         self.tb_similar_jumps = QTableWidget(self.gb_similar_jumps)
-        if (self.tb_similar_jumps.columnCount() < 4):
-            self.tb_similar_jumps.setColumnCount(4)
+        if (self.tb_similar_jumps.columnCount() < 6):
+            self.tb_similar_jumps.setColumnCount(6)
         __qtablewidgetitem9 = QTableWidgetItem()
         self.tb_similar_jumps.setHorizontalHeaderItem(0, __qtablewidgetitem9)
         __qtablewidgetitem10 = QTableWidgetItem()
@@ -438,11 +437,30 @@ class Ui_mw_Main(object):
         self.tb_similar_jumps.setHorizontalHeaderItem(2, __qtablewidgetitem11)
         __qtablewidgetitem12 = QTableWidgetItem()
         self.tb_similar_jumps.setHorizontalHeaderItem(3, __qtablewidgetitem12)
+        __qtablewidgetitem13 = QTableWidgetItem()
+        self.tb_similar_jumps.setHorizontalHeaderItem(4, __qtablewidgetitem13)
+        __qtablewidgetitem14 = QTableWidgetItem()
+        self.tb_similar_jumps.setHorizontalHeaderItem(5, __qtablewidgetitem14)
+        if (self.tb_similar_jumps.rowCount() < 3):
+            self.tb_similar_jumps.setRowCount(3)
+        __qtablewidgetitem15 = QTableWidgetItem()
+        self.tb_similar_jumps.setVerticalHeaderItem(0, __qtablewidgetitem15)
+        __qtablewidgetitem16 = QTableWidgetItem()
+        self.tb_similar_jumps.setVerticalHeaderItem(1, __qtablewidgetitem16)
+        __qtablewidgetitem17 = QTableWidgetItem()
+        self.tb_similar_jumps.setVerticalHeaderItem(2, __qtablewidgetitem17)
         self.tb_similar_jumps.setObjectName(u"tb_similar_jumps")
+        sizePolicy7 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        sizePolicy7.setHorizontalStretch(0)
+        sizePolicy7.setVerticalStretch(0)
+        sizePolicy7.setHeightForWidth(self.tb_similar_jumps.sizePolicy().hasHeightForWidth())
+        self.tb_similar_jumps.setSizePolicy(sizePolicy7)
+        self.tb_similar_jumps.setMinimumSize(QSize(650, 0))
         self.tb_similar_jumps.setFont(font2)
         self.tb_similar_jumps.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.tb_similar_jumps.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
         self.tb_similar_jumps.horizontalHeader().setDefaultSectionSize(110)
+        self.tb_similar_jumps.verticalHeader().setVisible(False)
 
         self.gridLayout_6.addWidget(self.tb_similar_jumps, 0, 1, 1, 1)
 
@@ -453,22 +471,9 @@ class Ui_mw_Main(object):
         self.verticalLayout.addLayout(self.hl_bottom)
 
         mw_Main.setCentralWidget(self.centralwidget)
-        self.menubar = QMenuBar(mw_Main)
-        self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1098, 33))
-        self.menuFile = QMenu(self.menubar)
-        self.menuFile.setObjectName(u"menuFile")
-        self.menuPerson = QMenu(self.menubar)
-        self.menuPerson.setObjectName(u"menuPerson")
-        mw_Main.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(mw_Main)
         self.statusbar.setObjectName(u"statusbar")
         mw_Main.setStatusBar(self.statusbar)
-
-        self.menubar.addAction(self.menuFile.menuAction())
-        self.menubar.addAction(self.menuPerson.menuAction())
-        self.menuFile.addAction(self.action_Quit)
-        self.menuPerson.addAction(self.actionAdd_Person)
 
         self.retranslateUi(mw_Main)
 
@@ -533,14 +538,22 @@ class Ui_mw_Main(object):
         self.gb_predicted_trajectory.setTitle(QCoreApplication.translate("mw_Main", u"Predicted Trajectory For Recommendation", None))
         self.gb_similar_jumps.setTitle(QCoreApplication.translate("mw_Main", u"Similar Jumps", None))
         ___qtablewidgetitem9 = self.tb_similar_jumps.horizontalHeaderItem(0)
-        ___qtablewidgetitem9.setText(QCoreApplication.translate("mw_Main", u"Serial #", None));
+        ___qtablewidgetitem9.setText(QCoreApplication.translate("mw_Main", u"Time", None));
         ___qtablewidgetitem10 = self.tb_similar_jumps.horizontalHeaderItem(1)
-        ___qtablewidgetitem10.setText(QCoreApplication.translate("mw_Main", u"Time", None));
+        ___qtablewidgetitem10.setText(QCoreApplication.translate("mw_Main", u"Weight", None));
         ___qtablewidgetitem11 = self.tb_similar_jumps.horizontalHeaderItem(2)
         ___qtablewidgetitem11.setText(QCoreApplication.translate("mw_Main", u"Anchor Offset", None));
         ___qtablewidgetitem12 = self.tb_similar_jumps.horizontalHeaderItem(3)
-        ___qtablewidgetitem12.setText(QCoreApplication.translate("mw_Main", u"Water Height", None));
-        self.menuFile.setTitle(QCoreApplication.translate("mw_Main", u"File", None))
-        self.menuPerson.setTitle(QCoreApplication.translate("mw_Main", u"Person", None))
+        ___qtablewidgetitem12.setText(QCoreApplication.translate("mw_Main", u"Horizontal Distance", None));
+        ___qtablewidgetitem13 = self.tb_similar_jumps.horizontalHeaderItem(4)
+        ___qtablewidgetitem13.setText(QCoreApplication.translate("mw_Main", u"Water Height", None));
+        ___qtablewidgetitem14 = self.tb_similar_jumps.horizontalHeaderItem(5)
+        ___qtablewidgetitem14.setText(QCoreApplication.translate("mw_Main", u"Harness", None));
+        ___qtablewidgetitem15 = self.tb_similar_jumps.verticalHeaderItem(0)
+        ___qtablewidgetitem15.setText(QCoreApplication.translate("mw_Main", u"New Row", None));
+        ___qtablewidgetitem16 = self.tb_similar_jumps.verticalHeaderItem(1)
+        ___qtablewidgetitem16.setText(QCoreApplication.translate("mw_Main", u"New Row", None));
+        ___qtablewidgetitem17 = self.tb_similar_jumps.verticalHeaderItem(2)
+        ___qtablewidgetitem17.setText(QCoreApplication.translate("mw_Main", u"New Row", None));
     # retranslateUi
 
