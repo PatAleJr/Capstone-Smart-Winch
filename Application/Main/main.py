@@ -64,24 +64,42 @@ class MainWindow(qtw.QMainWindow, Ui_mw_Main):
     def on_hs_planned_horizontal_distance_changed(self, value):
         self.lb_planned_horizontal_distance_value.setText(str(value))
 
-    def request_recommendation(self):
+    def get_current_inputs(self):
+        problems = []
+        harness = None
         if self.rb_ancle_forward.isChecked(): harness = "AF"
         elif self.rb_ancle_backward.isChecked(): harness = "AB"
         elif self.rb_body_backward.isChecked(): harness = "BB"
         elif self.rb_body_forward.isChecked(): harness = "BF"
-        else: 
-            print("No harness type selected. Cannot provide a recommendation.")
-            return
+        else: problems.append("Harness type not selected")
 
-        # Collect inputs
-        selected_pre_recommendation_settings = CordRecords.PreRecommendationJumpSettings(
-            weight = int(self.le_weight.text()),
-            height = parse_height(self.le_height.text()),
-            harness = harness,
-            desired_water_height = float(self.lb_desired_water_height_value.text()),
-            planned_horizontal_distance = float(self.lb_planned_horizontal_distance_value.text())
-        )
+        try: weight = int(self.le_weight.text())
+        except ValueError: problems.append("Enter weight as a number")
 
+        try: height = parse_height(self.le_height.text())
+        except (ValueError, IndexError): problems.append("Enter height in format like 6' 2\"")
+
+        if problems:
+            msg = qtw.QMessageBox(self)
+            msg.setWindowTitle("Missing or Invalid Inputs")
+            msg.setText("Missing or invalid inputs:\n\n" + "\n".join(problems))
+            font = qtg.QFont()
+            font.setPointSize(12)  # adjusted to reasonable size
+            msg.setFont(font)
+            msg.exec()
+        else:
+            return CordRecords.PreRecommendationJumpSettings(
+                weight = weight,
+                height = height,
+                harness = harness,
+                desired_water_height = float(self.lb_desired_water_height_value.text()),
+                planned_horizontal_distance = float(self.lb_planned_horizontal_distance_value.text())
+            )
+
+
+    def request_recommendation(self):
+        selected_pre_recommendation_settings = self.get_current_inputs()
+        if selected_pre_recommendation_settings is None: return
         # Come up with a recommendation
         print("Requesting a recommendation for jump parameters: " + str(selected_pre_recommendation_settings))
         for color, cord in self.current_cords_dict.items():

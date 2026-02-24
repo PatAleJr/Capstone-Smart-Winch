@@ -27,7 +27,7 @@ class Ui_mw_Main(object):
     def setupUi(self, mw_Main):
         if not mw_Main.objectName():
             mw_Main.setObjectName(u"mw_Main")
-        mw_Main.resize(1306, 867)
+        mw_Main.resize(1440, 867)
         font = QFont()
         font.setPointSize(12)
         mw_Main.setFont(font)
@@ -308,7 +308,9 @@ class Ui_mw_Main(object):
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.gb_cord_recommendations = QGroupBox(self.centralwidget)
         self.gb_cord_recommendations.setObjectName(u"gb_cord_recommendations")
-        self.gb_cord_recommendations.setMinimumSize(QSize(300, 0))
+        sizePolicy4.setHeightForWidth(self.gb_cord_recommendations.sizePolicy().hasHeightForWidth())
+        self.gb_cord_recommendations.setSizePolicy(sizePolicy4)
+        self.gb_cord_recommendations.setMinimumSize(QSize(200, 0))
         self.gb_cord_recommendations.setFont(font1)
         self.gridLayout_5 = QGridLayout(self.gb_cord_recommendations)
         self.gridLayout_5.setObjectName(u"gridLayout_5")
@@ -343,6 +345,8 @@ class Ui_mw_Main(object):
 
         self.gb_anchor_offset = QGroupBox(self.centralwidget)
         self.gb_anchor_offset.setObjectName(u"gb_anchor_offset")
+        sizePolicy4.setHeightForWidth(self.gb_anchor_offset.sizePolicy().hasHeightForWidth())
+        self.gb_anchor_offset.setSizePolicy(sizePolicy4)
         self.gb_anchor_offset.setFont(font1)
         self.gridLayout_7 = QGridLayout(self.gb_anchor_offset)
         self.gridLayout_7.setObjectName(u"gridLayout_7")
@@ -364,6 +368,7 @@ class Ui_mw_Main(object):
         self.le_custom_anchor_offset = QLineEdit(self.gb_anchor_offset)
         self.le_custom_anchor_offset.setObjectName(u"le_custom_anchor_offset")
         self.le_custom_anchor_offset.setMinimumSize(QSize(0, 50))
+        self.le_custom_anchor_offset.setFont(font2)
 
         self.gridLayout_7.addWidget(self.le_custom_anchor_offset, 0, 1, 1, 1)
 
@@ -407,9 +412,9 @@ class Ui_mw_Main(object):
 
         self.gb_predicted_trajectory = QGroupBox(self.centralwidget)
         self.gb_predicted_trajectory.setObjectName(u"gb_predicted_trajectory")
-        sizePolicy2.setHeightForWidth(self.gb_predicted_trajectory.sizePolicy().hasHeightForWidth())
-        self.gb_predicted_trajectory.setSizePolicy(sizePolicy2)
-        self.gb_predicted_trajectory.setMinimumSize(QSize(300, 0))
+        sizePolicy4.setHeightForWidth(self.gb_predicted_trajectory.sizePolicy().hasHeightForWidth())
+        self.gb_predicted_trajectory.setSizePolicy(sizePolicy4)
+        self.gb_predicted_trajectory.setMinimumSize(QSize(400, 0))
         self.gb_predicted_trajectory.setFont(font1)
         self.gridLayout = QGridLayout(self.gb_predicted_trajectory)
         self.gridLayout.setObjectName(u"gridLayout")
@@ -421,8 +426,13 @@ class Ui_mw_Main(object):
 
         self.hl_bottom.addWidget(self.gb_predicted_trajectory)
 
+        self.verticalLayout_2 = QVBoxLayout()
+        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.verticalLayout_2.setContentsMargins(-1, -1, 0, -1)
         self.gb_similar_jumps = QGroupBox(self.centralwidget)
         self.gb_similar_jumps.setObjectName(u"gb_similar_jumps")
+        sizePolicy2.setHeightForWidth(self.gb_similar_jumps.sizePolicy().hasHeightForWidth())
+        self.gb_similar_jumps.setSizePolicy(sizePolicy2)
         self.gb_similar_jumps.setFont(font1)
         self.gridLayout_6 = QGridLayout(self.gb_similar_jumps)
         self.gridLayout_6.setObjectName(u"gridLayout_6")
@@ -465,7 +475,56 @@ class Ui_mw_Main(object):
         self.gridLayout_6.addWidget(self.tb_similar_jumps, 0, 1, 1, 1)
 
 
-        self.hl_bottom.addWidget(self.gb_similar_jumps)
+        self.verticalLayout_2.addWidget(self.gb_similar_jumps)
+
+        self.gb_todays_jump_history = QGroupBox(self.centralwidget)
+        self.gb_todays_jump_history.setObjectName(u"gb_todays_jump_history")
+        sizePolicy8 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        sizePolicy8.setHorizontalStretch(0)
+        sizePolicy8.setVerticalStretch(50)
+        sizePolicy8.setHeightForWidth(self.gb_todays_jump_history.sizePolicy().hasHeightForWidth())
+        self.gb_todays_jump_history.setSizePolicy(sizePolicy8)
+        self.gb_todays_jump_history.setFont(font1)
+        self.gridLayout_8 = QGridLayout(self.gb_todays_jump_history)
+        self.gridLayout_8.setObjectName(u"gridLayout_8")
+        self.tableWidget = QTableWidget(self.gb_todays_jump_history)
+        if (self.tableWidget.columnCount() < 6):
+            self.tableWidget.setColumnCount(6)
+        __qtablewidgetitem18 = QTableWidgetItem()
+        self.tableWidget.setHorizontalHeaderItem(0, __qtablewidgetitem18)
+        __qtablewidgetitem19 = QTableWidgetItem()
+        self.tableWidget.setHorizontalHeaderItem(1, __qtablewidgetitem19)
+        __qtablewidgetitem20 = QTableWidgetItem()
+        self.tableWidget.setHorizontalHeaderItem(2, __qtablewidgetitem20)
+        __qtablewidgetitem21 = QTableWidgetItem()
+        self.tableWidget.setHorizontalHeaderItem(3, __qtablewidgetitem21)
+        __qtablewidgetitem22 = QTableWidgetItem()
+        self.tableWidget.setHorizontalHeaderItem(4, __qtablewidgetitem22)
+        __qtablewidgetitem23 = QTableWidgetItem()
+        self.tableWidget.setHorizontalHeaderItem(5, __qtablewidgetitem23)
+        if (self.tableWidget.rowCount() < 5):
+            self.tableWidget.setRowCount(5)
+        __qtablewidgetitem24 = QTableWidgetItem()
+        self.tableWidget.setVerticalHeaderItem(0, __qtablewidgetitem24)
+        __qtablewidgetitem25 = QTableWidgetItem()
+        self.tableWidget.setVerticalHeaderItem(1, __qtablewidgetitem25)
+        __qtablewidgetitem26 = QTableWidgetItem()
+        self.tableWidget.setVerticalHeaderItem(2, __qtablewidgetitem26)
+        __qtablewidgetitem27 = QTableWidgetItem()
+        self.tableWidget.setVerticalHeaderItem(3, __qtablewidgetitem27)
+        __qtablewidgetitem28 = QTableWidgetItem()
+        self.tableWidget.setVerticalHeaderItem(4, __qtablewidgetitem28)
+        self.tableWidget.setObjectName(u"tableWidget")
+        self.tableWidget.setFont(font2)
+        self.tableWidget.verticalHeader().setVisible(False)
+
+        self.gridLayout_8.addWidget(self.tableWidget, 0, 0, 1, 1)
+
+
+        self.verticalLayout_2.addWidget(self.gb_todays_jump_history)
+
+
+        self.hl_bottom.addLayout(self.verticalLayout_2)
 
 
         self.verticalLayout.addLayout(self.hl_bottom)
@@ -555,5 +614,28 @@ class Ui_mw_Main(object):
         ___qtablewidgetitem16.setText(QCoreApplication.translate("mw_Main", u"New Row", None));
         ___qtablewidgetitem17 = self.tb_similar_jumps.verticalHeaderItem(2)
         ___qtablewidgetitem17.setText(QCoreApplication.translate("mw_Main", u"New Row", None));
+        self.gb_todays_jump_history.setTitle(QCoreApplication.translate("mw_Main", u"Today's Jump History", None))
+        ___qtablewidgetitem18 = self.tableWidget.horizontalHeaderItem(0)
+        ___qtablewidgetitem18.setText(QCoreApplication.translate("mw_Main", u"Time", None));
+        ___qtablewidgetitem19 = self.tableWidget.horizontalHeaderItem(1)
+        ___qtablewidgetitem19.setText(QCoreApplication.translate("mw_Main", u"Weight", None));
+        ___qtablewidgetitem20 = self.tableWidget.horizontalHeaderItem(2)
+        ___qtablewidgetitem20.setText(QCoreApplication.translate("mw_Main", u"Anchor Offset", None));
+        ___qtablewidgetitem21 = self.tableWidget.horizontalHeaderItem(3)
+        ___qtablewidgetitem21.setText(QCoreApplication.translate("mw_Main", u"Horizontal Distance", None));
+        ___qtablewidgetitem22 = self.tableWidget.horizontalHeaderItem(4)
+        ___qtablewidgetitem22.setText(QCoreApplication.translate("mw_Main", u"Water Height", None));
+        ___qtablewidgetitem23 = self.tableWidget.horizontalHeaderItem(5)
+        ___qtablewidgetitem23.setText(QCoreApplication.translate("mw_Main", u"Harness", None));
+        ___qtablewidgetitem24 = self.tableWidget.verticalHeaderItem(0)
+        ___qtablewidgetitem24.setText(QCoreApplication.translate("mw_Main", u"New Row", None));
+        ___qtablewidgetitem25 = self.tableWidget.verticalHeaderItem(1)
+        ___qtablewidgetitem25.setText(QCoreApplication.translate("mw_Main", u"New Row", None));
+        ___qtablewidgetitem26 = self.tableWidget.verticalHeaderItem(2)
+        ___qtablewidgetitem26.setText(QCoreApplication.translate("mw_Main", u"New Row", None));
+        ___qtablewidgetitem27 = self.tableWidget.verticalHeaderItem(3)
+        ___qtablewidgetitem27.setText(QCoreApplication.translate("mw_Main", u"New Row", None));
+        ___qtablewidgetitem28 = self.tableWidget.verticalHeaderItem(4)
+        ___qtablewidgetitem28.setText(QCoreApplication.translate("mw_Main", u"New Row", None));
     # retranslateUi
 
