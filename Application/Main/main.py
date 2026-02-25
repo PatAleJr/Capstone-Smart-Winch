@@ -52,6 +52,10 @@ class MainWindow(qtw.QMainWindow, Ui_mw_Main):
                 self.tb_cords.setItem(row, 3, qtw.QTableWidgetItem("To be implemented"))
                 break
 
+        # Anchor offset
+        self.pb_set_custom_anchor_offset.clicked.connect(self.setCustomAnchorOffset)
+        self.pb_set_recommended_anchor_offset.clicked.connect(self.setRecommendedAnchorOffset)
+
     # Height and weight push buttons
     def on_pb_use_weight_clicked(self):
         self.le_weight.setText(self.lb_weight_value.text())
@@ -96,7 +100,6 @@ class MainWindow(qtw.QMainWindow, Ui_mw_Main):
                 planned_horizontal_distance = float(self.lb_planned_horizontal_distance_value.text())
             )
 
-
     def request_recommendation(self):
         selected_pre_recommendation_settings = self.get_current_inputs()
         if selected_pre_recommendation_settings is None: return
@@ -107,8 +110,8 @@ class MainWindow(qtw.QMainWindow, Ui_mw_Main):
             recommended_anchor_offset = cord.get_recommended_anchor_offset(selected_pre_recommendation_settings)
             if 6 < recommended_anchor_offset < 36:
                 # Update the UI with the recommendation
-                print(f"Recommended anchor offset for cord {cord.serial_number} ({color}): {recommended_anchor_offset:.2f} ft")
-                self.lb_recommended_anchor_offset.setText(f"Anchor Offset: {recommended_anchor_offset:.2f}")
+                print(f"Recommended anchor offset for cord {cord.serial_number} ({color}): {height_to_inches_and_feet(recommended_anchor_offset)}")
+                self.lb_recommended_anchor_offset_value.setText(height_to_inches_and_feet(recommended_anchor_offset))
                 self.lb_recommended_cord.setText(f"Use cord: {cord.serial_number} ({color})")
 
                 dummy_jump = CordRecords.JumpDataPoint(
@@ -138,6 +141,40 @@ class MainWindow(qtw.QMainWindow, Ui_mw_Main):
                 return
 
         print("No cords could provide a safe anchor offset")
+
+    def setCustomAnchorOffset(self):
+        try: desired_anchor_offset = parse_height(self.le_custom_anchor_offset.text())
+        except: 
+            msg = self.createMessageBox("Invalid Anchor Offset", "Enter desired anchor offset in format like 6' 2\"")
+            msg.exec()
+            return
+        msg = self.createMessageBox("Custom Anchor Offset Set", f"Anchor offset set to custom value of {self.le_custom_anchor_offset_value.text()}")
+        msg.setStandardButtons(qtw.QMessageBox.Ok | qtw.QMessageBox.Cancel)
+        result = msg.exec()
+        if result == qtw.QMessageBox.Ok:
+            self.lb_current_anchor_offset_value.setText(height_to_inches_and_feet(desired_anchor_offset))
+
+    def setRecommendedAnchorOffset(self):
+        msg = self.createMessageBox("Recommended Anchor Offset Set", f"Anchor offset set to recommended value of {self.lb_recommended_anchor_offset_value.text()}")
+        msg.setStandardButtons(qtw.QMessageBox.Ok | qtw.QMessageBox.Cancel)
+        result = msg.exec()
+        if result == qtw.QMessageBox.Ok:
+            self.lb_current_anchor_offset_value.setText(self.lb_recommended_anchor_offset_value.text())
+
+    def createMessageBox(self, title: str, text: str) -> qtw.QMessageBox:
+        msg = qtw.QMessageBox(self)
+        msg.setWindowTitle(title)
+        msg.setText(text)
+        font = qtg.QFont()
+        font.setPointSize(12)
+        msg.setFont(font)
+        return msg
+
+def height_to_inches_and_feet(height: float) -> str:
+    """Convert height in feet as float to a string like "6' 2\"". Rounds inches to nearest whole number."""
+    feet = int(height)
+    inches = round((height - feet) * 12)
+    return f"{feet}' {inches}\""
 
 def parse_height(height_str: str) -> float:
     """Parse height string like "6' 2\"" into total feet as float."""
