@@ -1,6 +1,6 @@
 import serial
 import sys
-import time
+import asyncio
 
 class ArduinoInterface:
     def __init__(self, port=None, baudrate=9600, timeout=1):
@@ -15,20 +15,20 @@ class ArduinoInterface:
         self.timeout = timeout
         self.serial_conn = None
     
-    def open(self):
-        """
-        Open serial connection to Arduino.
-        Args:
-            port (str): Serial port to connect to
-        """
-        self.close()  # Close existing connection if open
+    async def open(self):
+        self.close()
         try:
             if not self.port:
                 raise ValueError("Port must be specified either in __init__ or open()")
             
             self.serial_conn = serial.Serial(port=self.port, baudrate=self.baudrate, timeout=self.timeout)
             print(f"Connected to Arduino on {self.port} at {self.baudrate} baud")
-            time.sleep(2)  # Give Arduino time to initialize
+            
+            try:
+                await asyncio.sleep(2)  # Give Arduino time to initialize
+            except asyncio.CancelledError:
+                self.close()
+                print("Error sleeping after opening serial port", file=sys.stderr)
         
         except serial.SerialException as e:
             print(f"Error opening serial port {self.port}: {e}", file=sys.stderr)
@@ -40,45 +40,26 @@ class ArduinoInterface:
             self.serial_conn.close()
             print("Serial connection closed")
 
-    def read_data(self, num_samples=None):
-        """
-        Read temperature and humidity data from Arduino.
-        
-        Args:
-            num_samples (int): Number of data samples to read (None for continuous)
-        """
+    async def read_humidity(self) -> float:
+        self.serial_conn.write("HUMIDITY\n".encode())
+        try:
+            await asyncio.sleep(1)  # Give Arduino time to respond
+        except asyncio.CancelledError:
+            self.close()
+            raise
+        return float(self.read_a_line())
+
+    def read_a_line(self):
         if not self.serial_conn or not self.serial_conn.is_open:
             raise RuntimeError("Serial connection not open. Call open() first.")
         
-        if num_samples is not None:
-            print(f"Reading {num_samples} samples from Arduino...")
-        else:
-            print("Reading non-stop data from Arduino (press Ctrl+C to stop)...")
-
-        sample_count = 0
-        
         try:
-            while True:
-                if num_samples and sample_count >= num_samples:
-                    break
-                
-                # Read a line from serial
-                if self.serial_conn.in_waiting > 0:
-                    line = self.serial_conn.readline().decode('utf-8').strip()
-                    
-                    if line:
-                        print(line)
-                        sample_count += 1
-                
-                time.sleep(0.1)  # Small delay to prevent CPU spinning
-        
-        except KeyboardInterrupt:
-            print("\nStopped reading data")
+            if self.serial_conn.in_waiting > 0:
+                line = self.serial_conn.readline().decode('utf-8').strip()
+                if line == "ERROR":
+                    print("Received error message from Arduino")
+                    return None
+                return line
         except Exception as e:
             print(f"Error reading serial data: {e}", file=sys.stderr)
             raise
-
-arduino_interface = ArduinoInterface(port='COM3')  # Update with your port
-arduino_interface.open()
-arduino_interface.read_data(num_samples=100)  # Read 100 samples, or set to None for continuous
-arduino_interface.close()

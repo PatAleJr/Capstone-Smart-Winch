@@ -12,20 +12,19 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  delay(2000);
+  delay(500);
 
-  float h = dht.readHumidity();
-  float t = dht.readTemperature();
+  if (Serial.available() > 0) {
+    String command = Serial.readStringUntil('\n');
 
-  if (isnan(h) || isnan(t)) {
-    Serial.println("Failed to read from DHT sensor!");
-    return;
+    if (command == "HUMIDITY") {
+      float humidity = dht.readHumidity();
+      if (isnan(humidity)) {
+        Serial.println("ERROR");
+      } else {
+        Serial.println(humidity);
+      }
+    }
+
   }
-
-  Serial.print("Humidity: ");
-  Serial.println(h);
-  Serial.print("% Temperature: ");
-  Serial.print(t);
-  Serial.println("C");
 }

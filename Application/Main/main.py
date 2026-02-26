@@ -8,8 +8,12 @@ from PySide6 import QtCore as qtc
 from PySide6 import QtWidgets as qtw
 from PySide6 import QtGui as qtg
 
+import PySide6.QtAsyncio as QtAsyncio
+import asyncio
+
 from Main.UI.main_window_ui import Ui_mw_Main
 
+import ArduinoInterface
 import CordRecords
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -55,6 +59,16 @@ class MainWindow(qtw.QMainWindow, Ui_mw_Main):
         # Anchor offset
         self.pb_set_custom_anchor_offset.clicked.connect(self.setCustomAnchorOffset)
         self.pb_set_recommended_anchor_offset.clicked.connect(self.setRecommendedAnchorOffset)
+
+        # Arduino interface
+        self.arduino_interface = ArduinoInterface.ArduinoInterface(port='COM3')  # Update with your port
+        # launch the periodic reader as a background asyncio task.  QtAsyncio.run
+        # conveniently returns the created Task object so we can cancel it later.
+        try:
+            self._arduino_loop_task = QtAsyncio.run(self.initialize_periodic_update_of_arduino_readings(3))
+        except Exception:
+            # some versions of QtAsyncio may not return a task; fall back to None
+            self._arduino_loop_task = None
 
     # Height and weight push buttons
     def on_pb_use_weight_clicked(self):
@@ -169,6 +183,33 @@ class MainWindow(qtw.QMainWindow, Ui_mw_Main):
         font.setPointSize(12)
         msg.setFont(font)
         return msg
+
+    def cleanup(self):
+        """Cancel outstanding asyncio work and close the serial port."""
+        # cancel the periodic update task if it exists
+        task = getattr(self, '_arduino_loop_task', None)
+        if task is not None:
+            try:
+                task.cancel()
+            except Exception:
+                pass
+        self.arduino_interface.close()
+
+    def closeEvent(self, event):
+        # make sure we tidy up when the window is closed directly
+        self.cleanup()
+        super().closeEvent(event)
+
+    async def initialize_periodic_update_of_arduino_readings(self, period_seconds = 1):
+        while True:
+            await self.arduino_interface.open()
+            h = await self.arduino_interface.read_humidity()
+            print("Humidity from Arduino: " + str(h))
+            self.arduino_interface.close()
+
+            self.lb_humidity_value.setText(f"{h:.1f}%")
+
+            await asyncio.sleep(period_seconds)
 
 def height_to_inches_and_feet(height: float) -> str:
     """Convert height in feet as float to a string like "6' 2\"". Rounds inches to nearest whole number."""
