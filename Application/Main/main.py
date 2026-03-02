@@ -61,14 +61,9 @@ class MainWindow(qtw.QMainWindow, Ui_mw_Main):
         self.pb_set_recommended_anchor_offset.clicked.connect(self.setRecommendedAnchorOffset)
 
         # Arduino interface
+        self.read_arduino_periodically = True
         self.arduino_interface = ArduinoInterface.ArduinoInterface(port='COM3')  # Update with your port
-        # launch the periodic reader as a background asyncio task.  QtAsyncio.run
-        # conveniently returns the created Task object so we can cancel it later.
-        try:
-            self._arduino_loop_task = QtAsyncio.run(self.initialize_periodic_update_of_arduino_readings(3))
-        except Exception:
-            # some versions of QtAsyncio may not return a task; fall back to None
-            self._arduino_loop_task = None
+        QtAsyncio.run(self.initialize_periodic_update_of_arduino_readings(3), keep_running=False)
 
     # Height and weight push buttons
     def on_pb_use_weight_clicked(self):
@@ -184,30 +179,28 @@ class MainWindow(qtw.QMainWindow, Ui_mw_Main):
         msg.setFont(font)
         return msg
 
-    def cleanup(self):
-        """Cancel outstanding asyncio work and close the serial port."""
-        # cancel the periodic update task if it exists
-        task = getattr(self, '_arduino_loop_task', None)
-        if task is not None:
-            try:
-                task.cancel()
-            except Exception:
-                pass
-        self.arduino_interface.close()
-
-    def closeEvent(self, event):
-        # make sure we tidy up when the window is closed directly
-        self.cleanup()
-        super().closeEvent(event)
-
     async def initialize_periodic_update_of_arduino_readings(self, period_seconds = 1):
-        while True:
+        while self.read_arduino_periodically:
             await self.arduino_interface.open()
-            h = await self.arduino_interface.read_humidity()
-            print("Humidity from Arduino: " + str(h))
+            msmts = {"HUM": None, "TMP": None}
+            for msmt in msmts.keys():
+                self.arduino_interface.request_sensor_data(msmt)
+
+            await asyncio.sleep(1)  # Wait a moment for Arduino to process requests and send responses
+
+            for i in range(msmts.__len__()):
+                response = self.arduino_interface.read_a_line()
+                response_code = response[:3]
+                for msmt_code in msmts.keys():
+                    if response_code == msmt_code:
+                        msmts[msmt_code] = response[4:]
+                        if msmts[msmt_code] == "ERROR": print(f"Arduino got error trying to read {msmt_code}")
+                        break
+            
             self.arduino_interface.close()
 
-            self.lb_humidity_value.setText(f"{h:.1f}%")
+            self.lb_humidity_value.setText(f"{msmts['HUM']}")
+            self.lb_temperature_value.setText(f"{msmts['TMP']}")
 
             await asyncio.sleep(period_seconds)
 
@@ -224,7 +217,11 @@ def parse_height(height_str: str) -> float:
     inches = int(parts[1].strip()) if len(parts) > 1 and parts[1].strip() else 0
     return feet + inches / 12
 
+def close_app(app, main_window):
+    main_window.read_arduino_periodically = False  # Stop the Arduino reading loop when app is closed
+    app.exec()
+
 if __name__ == "__main__":   
     app = qtw.QApplication(sys.argv)
     window= MainWindow()
-    sys.exit(app.exec())
+    sys.exit(close_app(app, window))

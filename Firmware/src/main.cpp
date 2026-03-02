@@ -12,19 +12,24 @@ void setup() {
 }
 
 void loop() {
-  delay(500);
-
   if (Serial.available() > 0) {
     String command = Serial.readStringUntil('\n');
 
-    if (command == "HUMIDITY") {
+    if (command.equals("HUM")) {
       float humidity = dht.readHumidity();
       if (isnan(humidity)) {
-        Serial.println("ERROR");
+        Serial.println("HUM:ERROR");
       } else {
-        Serial.println(humidity);
+        Serial.println("HUM:" + String(humidity) + "%");
       }
-    }
 
+    } else if (command.equals("TMP")) {
+      float temperature = dht.readTemperature();
+      if (isnan(temperature)) {
+        Serial.println("TMP:ERROR");
+      } else {
+        Serial.println("TMP:" + String(temperature) + "C");
+      }
+    }  
   }
 }

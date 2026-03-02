@@ -40,26 +40,15 @@ class ArduinoInterface:
             self.serial_conn.close()
             print("Serial connection closed")
 
-    async def read_humidity(self) -> float:
-        self.serial_conn.write("HUMIDITY\n".encode())
-        try:
-            await asyncio.sleep(1)  # Give Arduino time to respond
-        except asyncio.CancelledError:
-            self.close()
-            raise
-        return float(self.read_a_line())
+    # Sends arduino a serial message indicating a request for a sensor reading
+    # Sensor must be one of "HUM" or "TMP"
+    def request_sensor_data(self, sensor) -> str:
+        self.serial_conn.write(f"{sensor}\n".encode())
 
     def read_a_line(self):
         if not self.serial_conn or not self.serial_conn.is_open:
             raise RuntimeError("Serial connection not open. Call open() first.")
         
-        try:
-            if self.serial_conn.in_waiting > 0:
-                line = self.serial_conn.readline().decode('utf-8').strip()
-                if line == "ERROR":
-                    print("Received error message from Arduino")
-                    return None
-                return line
-        except Exception as e:
-            print(f"Error reading serial data: {e}", file=sys.stderr)
-            raise
+        if self.serial_conn.in_waiting > 0:
+            line = self.serial_conn.readline().decode('utf-8').strip()
+            return line
