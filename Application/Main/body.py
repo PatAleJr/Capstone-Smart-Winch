@@ -29,6 +29,16 @@ def estimate_height_from_weight(weight_lbs: float) -> float:
     height_feet = height_inches / 12  # Convert to feet
     return height_feet
 
+def compute_BMI(weight_lbs, height_ft):
+    return weight_lbs / (height_ft * 12) ** 2 * 703
+
+def compute_area_from_weight_and_height(weight_lbs, height_ft):
+    height_cm = height_ft * 30.48
+    weight_kg = weight_lbs * 0.453592
+    return 0.00191 * height_cm ** 0.725 * weight_kg ** 0.425
+
+print(compute_area_from_weight_and_height(200, 6))
+
 ## The below was used for np arrays
 
 # The distance from the person's harness attachment point to the part of their body that touches the water

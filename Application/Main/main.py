@@ -181,7 +181,13 @@ class MainWindow(qtw.QMainWindow, Ui_mw_Main):
 
     async def initialize_periodic_update_of_arduino_readings(self, period_seconds = 1):
         while self.read_arduino_periodically:
-            await self.arduino_interface.open()
+            try:
+                await self.arduino_interface.open()
+            except Exception as e:
+                print(f"Error opening serial connection to Arduino. Trying again later: {e}")
+                await asyncio.sleep(period_seconds)
+                continue
+            
             msmts = {"HUM": None, "TMP": None}
             for msmt in msmts.keys():
                 self.arduino_interface.request_sensor_data(msmt)

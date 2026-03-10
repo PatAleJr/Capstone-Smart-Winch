@@ -103,3 +103,9 @@ def simulate_jump(fitting_params, jump_data, cord, plotting=False, figure=None):
         #print("Warning: Simulation reached t_max without rebound. fitting parameters tried were: " + str(fitting_params))
         #print("Jump was : " + str(jump_data))
     return min_y
+
+def compute_drag_multiplier_k(weight, height, temperature = 23, humidity = 0.6):
+    BMI = body.compute_BMI(weight, height)
+    Cd = 1.05 * (1 + 0.02* (temperature - 20)) * (1 + 0.01 * humidity) * (1 + 0.15 * BMI)
+    A = body.compute_area_from_weight_and_height(weight, height)
+    rho = 1.225
