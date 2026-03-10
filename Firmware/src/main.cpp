@@ -4,14 +4,30 @@
 #define DHTPIN 2     // Digital pin connected to the DHT sensor
 #define DHTTYPE DHT22   // DHT 22
 
+#define IN_RELAY_PIN 3
+#define OUT_RELAY_PIN 4
+
 DHT dht(DHTPIN, DHTTYPE);
 
 void setup() {
   Serial.begin(9600);
   dht.begin();
+
+  pinMode(IN_RELAY_PIN, OUTPUT);
+  pinMode(OUT_RELAY_PIN, OUTPUT);
 }
 
 void loop() {
+
+  digitalWrite(OUT_RELAY_PIN, HIGH);
+  delay(2000);
+  digitalWrite(OUT_RELAY_PIN, LOW);
+  delay(2000);
+  digitalWrite(IN_RELAY_PIN, HIGH);
+  delay(2000);
+  digitalWrite(IN_RELAY_PIN, LOW);
+  delay(2000);
+
   if (Serial.available() > 0) {
     String command = Serial.readStringUntil('\n');
 
