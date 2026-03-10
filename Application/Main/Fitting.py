@@ -36,6 +36,8 @@ def validate_cord(cord: CordRecords.Cord, fitting_params, jumps, num_worst_jumps
 def fit_and_validate_cord(cord: CordRecords.Cord, num_training_jumps: int, num_validation_jumps: int):
     print("Fitting cord " + str(cord.serial_number) + " using " + str(num_training_jumps) + " random jumps, and validating on " + str(num_validation_jumps) + " random jumps.")
 
+    if num_training_jumps + num_validation_jumps > len(cord.jump_data):
+        raise ValueError(f"Requesting a fit using more data points than available")
     randomly_shuffled_jumps = np.random.permutation(cord.jump_data)
     training_jumps = randomly_shuffled_jumps[:num_training_jumps]
     validation_jumps = randomly_shuffled_jumps[num_training_jumps:num_training_jumps + num_validation_jumps]

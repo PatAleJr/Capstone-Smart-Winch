@@ -187,7 +187,7 @@ class MainWindow(qtw.QMainWindow, Ui_mw_Main):
                 print(f"Error opening serial connection to Arduino. Trying again later: {e}")
                 await asyncio.sleep(period_seconds)
                 continue
-            
+
             msmts = {"HUM": None, "TMP": None}
             for msmt in msmts.keys():
                 self.arduino_interface.request_sensor_data(msmt)

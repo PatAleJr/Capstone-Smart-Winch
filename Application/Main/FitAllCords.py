@@ -39,11 +39,12 @@ for _, row in bci_df.iterrows():
     try:
         serial_num = str(int(row.iloc[1]))  # SERIAL # column (index 1, 0-indexed)
         wraps = str(int(row.iloc[2]))       # WRAPS column (index 2, 0-indexed)
+        batch = str(int(row.iloc[4]))       # BATCH column (index 4, 0-indexed)
         force = float(row.iloc[10])         # END LOAD column (index 10, 0-indexed)
         length_str = row.iloc[13]           # FINAL LENGTH column (index 13, 0-indexed)
         length = parse_feet_inches(length_str)
         combined_serial = serial_num + wraps
-        bci_dict[combined_serial] = (length, force)
+        bci_dict[combined_serial] = (batch, length, force)
     except (ValueError, IndexError):
         continue
 
@@ -61,16 +62,17 @@ for color_dir in sorted(jump_data_path.iterdir()):
             serial_str = csv_file.stem  # Filename without extension
             if serial_str in bci_dict:
                 try:
-                    unstretched_length, force_at_300 = bci_dict[serial_str]
-                    cord = CordRecords.Cord(int(serial_str), color, unstretched_length, force_at_300)
-                    num_training = int(cord.number_of_jumps * 0.8)
-                    num_validation = int(cord.number_of_jumps * 0.2)
+                    batch, unstretched_length, force_at_300 = bci_dict[serial_str]
+                    cord = CordRecords.Cord(int(serial_str), batch, color, unstretched_length, force_at_300)
+                    num_data_points = len(cord.jump_data) # Cannot use cord.num_jumps because we deleted many rows when cleaning data
+                    num_training = int(num_data_points * 0.8)
+                    num_validation = int(num_data_points * 0.2)
                     if num_training > 0 and num_validation > 0:
-                        print(f"\nProcessing cord {serial_str} ({color}): {cord.number_of_jumps} jumps total")
+                        print(f"\nProcessing cord {serial_str} ({color}): {num_data_points} jumps total")
                         Fitting.fit_and_validate_cord(cord, num_training, num_validation)
                         cords_processed += 1
                     else:
-                        print(f"Skipping cord {serial_str} ({color}): insufficient data ({cord.number_of_jumps} jumps)")
+                        print(f"Skipping cord {serial_str} ({color}): insufficient data ({num_data_points} jumps)")
                         cords_skipped += 1
                 except Exception as e:
                     print(f"Error processing cord {serial_str} ({color}): {e}")

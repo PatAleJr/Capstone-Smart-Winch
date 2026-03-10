@@ -72,8 +72,9 @@ class FittingAndValidatingResult:
         return d
 
 class Cord:
-    def __init__(self, serial_number, color, unstretched_length, force_at_300_elongation):
+    def __init__(self, serial_number, batch, color, unstretched_length, force_at_300_elongation):
         self.serial_number = serial_number
+        self.batch = batch
         self.color = color
         self.weight = {"Yellow": 33, "Blue": 45, "Red": 50, "Purple": 60, "Black": 70}.get(color, 50)  # in lbs
         self.mass = self.weight / 32.174  # in slugs
@@ -124,6 +125,7 @@ class Cord:
         with open(os.path.join(cord_records_for_color_path, f"{self.serial_number}.json"), 'w') as f:
             f.write(json.dumps({
             "serial_number": self.serial_number,
+            "batch": self.batch,
             "color": self.color,
             "weight": self.weight,
             "mass": self.mass,
@@ -143,6 +145,7 @@ class Cord:
                 self.unstretched_length = data.get("unstretched_length", self.unstretched_length)
                 self.force_at_300_elongation = data.get("force_at_300_elongation", self.force_at_300_elongation)
                 self.number_of_jumps = data.get("number_of_jumps", self.number_of_jumps)
+                self.batch = data.get("batch", self.batch)
                 self.fit_and_validate_results = [FittingAndValidatingResult(
                     cord_serial_number=fit_result["cord_serial_number"],
                     fitting_params=FittingParams([fit_result["fitting_params"]["spring_constant"], fit_result["fitting_params"]["damping_constant"], fit_result["fitting_params"]["air_resistance_coefficient"], fit_result["fitting_params"]["constant_force"], fit_result["fitting_params"]["k_had_break"], fit_result["fitting_params"]["k_num_uses"]]),
@@ -236,7 +239,7 @@ def get_all_cord_records_from_jsons():
                     try:
                         with open(os.path.join(color_dir_path, json_file), 'r') as f:
                             data = json.load(f)
-                            cord = Cord(serial_number, data.get("color", "Unknown"), data.get("unstretched_length", 0), data.get("force_at_300_elongation", 0))
+                            cord = Cord(serial_number, data.get("batch", "Unknown"), data.get("color", "Unknown"), data.get("unstretched_length", 0), data.get("force_at_300_elongation", 0))
                             cord.update_from_json()  # Update cord with all details from JSON
                             cord_records.append(cord)
                     except (FileNotFoundError, json.JSONDecodeError) as e:

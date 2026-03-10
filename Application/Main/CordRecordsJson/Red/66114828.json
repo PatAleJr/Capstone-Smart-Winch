@@ -1,5 +1,6 @@
 {
     "serial_number": 66114828,
+    "batch": "180432",
     "color": "Red",
     "weight": 50,
     "mass": 1.5540498539193137,
@@ -66,6 +67,21 @@
             "MAE_from_random_validation": 4.089468629087776,
             "MSE_from_random_validation": 24.676919905275938,
             "num_jumps_validated_on": 79
+        },
+        {
+            "cord_serial_number": 66114828,
+            "fitting_params": {
+                "spring_constant": 2.750783640868639,
+                "damping_constant": 0.04150363695970821,
+                "air_resistance_coefficient": 0.004110438921842962,
+                "constant_force": 44.60464451288326,
+                "k_had_break": 0.0001310699030683661,
+                "k_num_uses": -7.031910791612267e-05
+            },
+            "num_jumps_trained_on": 596,
+            "MAE_from_random_validation": NaN,
+            "MSE_from_random_validation": NaN,
+            "num_jumps_validated_on": 149
         }
     ]
 }
