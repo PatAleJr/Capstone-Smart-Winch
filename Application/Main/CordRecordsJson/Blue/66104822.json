@@ -157,6 +157,51 @@
             "MAE_from_random_validation": 3.0203334013224277,
             "MSE_from_random_validation": 16.972546107988656,
             "num_jumps_validated_on": 25
+        },
+        {
+            "cord_serial_number": 66104822,
+            "fitting_params": {
+                "spring_constant": 3.5672196890167696,
+                "damping_constant": 0.020404774299329013,
+                "air_resistance_coefficient": 3.6970849680622845e-07,
+                "constant_force": 0.013164259957770392,
+                "k_had_break": 3.664313187292529e-14,
+                "k_num_uses": -0.00021805359023142125
+            },
+            "num_jumps_trained_on": 10,
+            "MAE_from_random_validation": 6.670945047202289,
+            "MSE_from_random_validation": 78.0492233758691,
+            "num_jumps_validated_on": 2
+        },
+        {
+            "cord_serial_number": 66104822,
+            "fitting_params": {
+                "spring_constant": 3.925951722472941,
+                "damping_constant": 0.008528249356509613,
+                "air_resistance_coefficient": 0.00026668431658603977,
+                "constant_force": 0.002385290923425715,
+                "k_had_break": 4.240221470104853e-14,
+                "k_num_uses": -5.4791517228205176e-05
+            },
+            "num_jumps_trained_on": 10,
+            "MAE_from_random_validation": 0.9941434516921199,
+            "MSE_from_random_validation": 1.353313987885769,
+            "num_jumps_validated_on": 2
+        },
+        {
+            "cord_serial_number": 66104822,
+            "fitting_params": {
+                "spring_constant": 3.6765454268651805,
+                "damping_constant": 0.012370475265758673,
+                "air_resistance_coefficient": 8.467389954826233e-09,
+                "constant_force": 9.628708455199217e-07,
+                "k_had_break": 4.751409174319467e-14,
+                "k_num_uses": -6.890992026431323e-05
+            },
+            "num_jumps_trained_on": 10,
+            "MAE_from_random_validation": 1.8618028674613043,
+            "MSE_from_random_validation": 5.031889973295637,
+            "num_jumps_validated_on": 2
         }
     ]
 }

@@ -65,8 +65,8 @@ for color_dir in sorted(jump_data_path.iterdir()):
                     batch, unstretched_length, force_at_300 = bci_dict[serial_str]
                     cord = CordRecords.Cord(int(serial_str), batch, color, unstretched_length, force_at_300)
                     num_data_points = len(cord.jump_data) # Cannot use cord.num_jumps because we deleted many rows when cleaning data
-                    num_training = int(num_data_points * 0.8)
-                    num_validation = int(num_data_points * 0.2)
+                    num_training = int(num_data_points * 0.08)
+                    num_validation = int(num_data_points * 0.02)
                     if num_training > 0 and num_validation > 0:
                         print(f"\nProcessing cord {serial_str} ({color}): {num_data_points} jumps total")
                         Fitting.fit_and_validate_cord(cord, num_training, num_validation)

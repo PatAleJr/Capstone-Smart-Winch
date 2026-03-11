@@ -76,13 +76,19 @@ class Cord:
         self.serial_number = serial_number
         self.batch = batch
         self.color = color
-        self.weight = {"Yellow": 33, "Blue": 45, "Red": 50, "Purple": 60, "Black": 70}.get(color, 50)  # in lbs
-        self.mass = self.weight / 32.174  # in slugs
         self.unstretched_length = unstretched_length  # in ft
+        self.weight = self.initialize_weight()  # in lbs
+        self.mass = self.weight / 32.174  # in slugs
         self.force_at_300_elongation = force_at_300_elongation  # in lbs
         self.initialize_jump_data()
         self.number_of_jumps = max(self.jump_data, key = lambda jump: jump.num_uses).num_uses + 1 if self.jump_data else 0
         self.fit_and_validate_results = [] # An array of FittingAndValidatingResult
+
+    def initialize_weight(self):
+        if self.batch == "180432":
+            weights_per_length = {"Yellow": 0.77, "Blue": 0.9, "Red": 1.04, "Purple": 1.20, "Black": 1.5}
+            return self.unstretched_length * weights_per_length[self.color]
+        return {"Yellow": 33, "Blue": 45, "Red": 50, "Purple": 60, "Black": 70}.get(self.color, 50)
 
     def get_initial_fitting_params_guess(self):
         initial_force = 100 # lb. Estimate provided by Matt Lawrence
